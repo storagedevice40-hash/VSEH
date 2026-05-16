@@ -959,7 +959,9 @@
             if(res && res.status === 'success') {
                 renderAiResponse(res.result);
             } else {
-                chat.innerHTML += `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-red-500 max-w-[85%] mb-4"><p class="text-xs font-bold text-red-600">Error processing command. AI backend issue.</p></div>`;
+                // 🔥 FIX: Show the ACTUAL error message coming from the backend
+                let actualError = (res && res.message) ? res.message : "Unknown API issue";
+                chat.innerHTML += `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-red-500 max-w-[85%] mb-4"><p class="text-xs font-bold text-red-600">Error: ${actualError}</p></div>`;
             }
             chat.scrollTop = chat.scrollHeight;
         }
