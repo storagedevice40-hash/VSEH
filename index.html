@@ -69,7 +69,13 @@
         .mobile-input:read-only, .mobile-input:disabled { background-color: #f1f5f9; color: #94a3b8; cursor: not-allowed; border-color: #e2e8f0; opacity: 0.8; }
         
         .drag-handle { width: 45px; height: 5px; background: #cbd5e1; border-radius: 5px; margin: 0 auto 20px auto; }
+        
+        /* Attendance Toggle Custom Styles */
+        .att-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .att-btn[data-selected="Present"] { background-color: #d1fae5 !important; color: #059669 !important; border-color: #34d399 !important; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2); }
+        .att-btn[data-selected="Absent"] { background-color: #fee2e2 !important; color: #dc2626 !important; border-color: #f87171 !important; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2); }
 
+        /* Dark Mode Overrides */
         body.dark-mode { background-color: #0f172a; color: #f1f5f9; }
         body.dark-mode .glass-panel { background: rgba(30, 41, 59, 0.95); border-color: #334155; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5); }
         body.dark-mode .glass-nav { background: #1e293b; border-color: #334155; }
@@ -77,8 +83,7 @@
         body.dark-mode .text-gray-800, body.dark-mode .text-gray-900 { color: #f1f5f9 !important; }
         body.dark-mode .text-gray-500, body.dark-mode .text-gray-400 { color: #94a3b8 !important; }
         body.dark-mode .text-indigo-900 { color: #818cf8 !important; }
-        body.dark-mode .bg-gray-50 { background-color: #0f172a !important; border-color: #334155 !important; color: #f8fafc !important; }
-        body.dark-mode .bg-gray-100 { background-color: #334155 !important; }
+        body.dark-mode .bg-gray-50, body.dark-mode .bg-gray-100 { background-color: #0f172a !important; border-color: #334155 !important; color: #f8fafc !important; }
         body.dark-mode .border-gray-100, body.dark-mode .border-gray-200 { border-color: #334155 !important; }
         body.dark-mode .mobile-input { background-color: #0f172a !important; border-color: #334155 !important; color: #f8fafc !important; }
         body.dark-mode .mobile-input:focus { border-color: #818cf8 !important; box-shadow: 0 0 0 4px rgba(129,140,248,0.2) !important; }
@@ -86,6 +91,12 @@
         body.dark-mode .mode-btn { background-color: #0f172a !important; border-color: #334155 !important; color: #94a3b8 !important; }
         body.dark-mode .mode-btn.border-indigo-200 { background-color: rgba(99,102,241,0.1) !important; border-color: #818cf8 !important; color: #818cf8 !important; }
         body.dark-mode .text-grad { background: linear-gradient(to right, #a78bfa, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .ai-chip { white-space: nowrap; display: inline-flex; align-items: center; }
+        .ai-tools-scroll { display: flex; overflow-x: auto; gap: 0.5rem; padding-bottom: 0.5rem; scroll-snap-type: x mandatory; }
+        .ai-tools-scroll::-webkit-scrollbar { height: 4px; display: block; }
+        .ai-tools-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+        body.dark-mode .ai-tools-scroll::-webkit-scrollbar-thumb { background-color: #475569; }
     </style>
 </head>
 <body class="flex flex-col h-screen overflow-hidden w-full max-w-500 relative transition-colors duration-300">
@@ -104,7 +115,7 @@
 
     <header class="glass-panel mx-4 mt-4 mb-2 rounded-3xl z-20 flex justify-between items-start p-4">
         <div class="flex flex-col flex-1 min-w-0 pr-2">
-            <h1 class="text-xl font-black tracking-tight text-grad uppercase leading-tight whitespace-normal break-words">vseh</h1>
+            <h1 class="text-xl font-black tracking-tight text-grad uppercase leading-tight whitespace-normal break-words">vseh pro</h1>
             <div class="flex items-center space-x-1.5 text-8 font-black text-gray-400 uppercase mt-1 tracking-widest whitespace-nowrap overflow-hidden">
                 <i class="far fa-calendar-alt"></i> <span id="headerDate">--/--/----</span>
                 <span class="text-gray-300">|</span>
@@ -121,7 +132,6 @@
     </header>
 
     <main class="flex-1 overflow-y-auto px-4 w-full">
-        <!-- DASHBOARD -->
         <section id="dashboard" class="view-section active">
             <div class="flex justify-between items-end mb-4 px-1">
                 <h2 class="text-2xl font-black text-gray-800 tracking-tight">Overview</h2>
@@ -166,39 +176,78 @@
             <div id="recent-list" class="space-y-3"></div>
         </section>
 
-        <!-- AI HUB SECTION (NEW) -->
+        <section id="attendance" class="view-section">
+            <div class="flex justify-between items-end mb-6 px-1">
+                <div>
+                    <h2 class="text-2xl font-black text-gray-800 tracking-tight">Attendance</h2>
+                    <p class="text-10 font-black text-gray-400 uppercase tracking-widest mt-1">Mark Daily Status</p>
+                </div>
+                <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600"><i class="fas fa-clipboard-user text-xl"></i></div>
+            </div>
+            
+            <div class="glass-panel rounded-32 p-5 mb-5 shadow-sm">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-10 font-black text-gray-500 uppercase tracking-widest ml-1 mb-1.5">Class</label>
+                        <select id="attClass" onchange="loadAttendanceStudents()" class="mobile-input bg-gray-50 force-uppercase"><option value="">- SELECT -</option></select>
+                    </div>
+                    <div>
+                        <label class="block text-10 font-black text-gray-500 uppercase tracking-widest ml-1 mb-1.5">Date</label>
+                        <input type="date" id="attDate" class="mobile-input bg-gray-50 text-xs px-2">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-between items-center mb-3 px-1">
+                <h3 class="text-10 font-black text-gray-500 tracking-widest uppercase"><i class="fas fa-users text-blue-500 mr-1.5"></i> STUDENT LIST</h3>
+                <button onclick="markAllPresent()" class="text-10 font-black text-green-600 bg-green-50 px-3 py-1 rounded-lg uppercase border border-green-200 active:scale-95 transition">All Present</button>
+            </div>
+            
+            <div id="attendance-list" class="space-y-3 mb-6">
+                <p class="text-center text-gray-400 text-xs font-bold mt-10">Select a class to mark attendance</p>
+            </div>
+            
+            <button onclick="submitAttendance()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-sm mt-2 shadow-lg active:scale-95 transition uppercase tracking-widest flex items-center justify-center">
+                SAVE ATTENDANCE <i class="fas fa-cloud-arrow-up ml-2 text-lg"></i>
+            </button>
+        </section>
+
         <section id="aihub" class="view-section relative">
             <div class="flex justify-between items-end mb-4 px-1">
                 <div>
                     <h2 class="text-2xl font-black text-purple-600 tracking-tight">AI Co-Pilot</h2>
-                    <p class="text-10 font-black text-gray-400 uppercase tracking-widest mt-1">Advanced 10+ Features</p>
+                    <p class="text-10 font-black text-gray-400 uppercase tracking-widest mt-1">Super-Advanced Tools</p>
                 </div>
                 <span class="text-10 font-black text-white bg-purple-600 px-2.5 py-1 rounded-lg uppercase shadow-md"><i class="fas fa-brain mr-1"></i> Gemini Active</span>
             </div>
             
-            <div id="ai-chat-history" class="space-y-4 mb-20 overflow-y-auto" style="height: 55vh;">
-                <!-- Welcome message -->
+            <div class="ai-tools-scroll mb-4 pb-2">
+                <button onclick="sendAiCommand('Show my daily todo list for today.')" class="ai-chip text-9 bg-purple-50 text-purple-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-purple-200 snap-center"><i class="fas fa-list-check mr-2"></i> Daily To-Do</button>
+                <button onclick="sendAiCommand('Generate a 20 marks test paper for Physics.')" class="ai-chip text-9 bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-indigo-200 snap-center"><i class="fas fa-file-signature mr-2"></i> Create Test</button>
+                <button onclick="sendAiCommand('Draft a polite reply to a parent asking for fee extension.')" class="ai-chip text-9 bg-pink-50 text-pink-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-pink-200 snap-center"><i class="fas fa-comments mr-2"></i> Parent Reply</button>
+                <button onclick="sendAiCommand('Analyze revenue projection for the next 30 days based on payments.')" class="ai-chip text-9 bg-green-50 text-green-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-green-200 snap-center"><i class="fas fa-chart-line mr-2"></i> Rev Forecast</button>
+                <button onclick="sendAiCommand('Provide a syllabus pace alert. Are we lagging?')" class="ai-chip text-9 bg-red-50 text-red-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-red-200 snap-center"><i class="fas fa-triangle-exclamation mr-2"></i> Syllabus Alert</button>
+                <button onclick="sendAiCommand('Create a festival greeting message for all students.')" class="ai-chip text-9 bg-yellow-50 text-yellow-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-yellow-200 snap-center"><i class="fas fa-gift mr-2"></i> Greetings</button>
+                <button onclick="sendAiCommand('Recommend scholarship % for a bright student.')" class="ai-chip text-9 bg-blue-50 text-blue-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-blue-200 snap-center"><i class="fas fa-award mr-2"></i> Scholarship</button>
+                <button onclick="sendAiCommand('Summarize today class for absent students.')" class="ai-chip text-9 bg-orange-50 text-orange-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-orange-200 snap-center"><i class="fas fa-microphone-lines mr-2"></i> Audio Note</button>
+                <button onclick="sendAiCommand('How to split a batch of 60 students effectively?')" class="ai-chip text-9 bg-teal-50 text-teal-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-teal-200 snap-center"><i class="fas fa-people-arrows mr-2"></i> Batch Split</button>
+            </div>
+
+            <div id="ai-chat-history" class="space-y-4 mb-20 overflow-y-auto" style="height: 48vh;">
                 <div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-purple-500 shadow-sm">
-                    <p class="text-xs font-bold text-gray-700 dark:text-gray-200">Hello Vijay Sir! Main aapka autonomous AI Assistant hoon. Main aapki har operations aur management me madad karunga.</p>
-                    <div class="flex flex-wrap gap-2 mt-3">
-                        <button onclick="sendAiCommand('Show my daily todo list')" class="text-9 bg-purple-50 text-purple-600 px-3 py-1.5 rounded-lg font-black uppercase active:scale-95 transition border border-purple-100"><i class="fas fa-list-check mr-1"></i> Daily To-Do</button>
-                        <button onclick="sendAiCommand('Generate 20 marks test for Class 10')" class="text-9 bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-lg font-black uppercase active:scale-95 transition border border-indigo-100"><i class="fas fa-file-signature mr-1"></i> Create Test</button>
-                        <button onclick="sendAiCommand('Revenue projection for next 30 days')" class="text-9 bg-green-50 text-green-600 px-3 py-1.5 rounded-lg font-black uppercase active:scale-95 transition border border-green-100"><i class="fas fa-chart-line mr-1"></i> Revenue Forecast</button>
-                    </div>
+                    <p class="text-xs font-bold text-gray-700 dark:text-gray-200">Hello Vijay Sir! Main aapka autonomous AI Assistant hoon. Upar diye gaye kisi bhi smart tool par click karein ya apna command type karein.</p>
                 </div>
             </div>
 
-            <!-- Chat Input Anchor -->
             <div class="fixed bottom-20 left-4 right-4 max-w-500 mx-auto z-30 pb-2">
                 <div class="glass-panel rounded-full p-1.5 flex items-center shadow-xl border border-gray-200 dark:border-gray-700">
                     <button onclick="simulateAudioInput()" class="w-10 h-10 text-gray-400 hover:text-purple-600 flex items-center justify-center transition"><i class="fas fa-microphone"></i></button>
-                    <input type="text" id="ai-input" placeholder="Type prompt (e.g. Generate test...)" class="flex-1 bg-transparent border-none outline-none px-2 text-sm font-bold text-gray-700 dark:text-gray-200" onkeypress="if(event.key === 'Enter') sendAiCommand(this.value)">
+                    <input type="text" id="ai-input" placeholder="Type command..." class="flex-1 bg-transparent border-none outline-none px-2 text-sm font-bold text-gray-700 dark:text-gray-200" onkeypress="if(event.key === 'Enter') sendAiCommand(this.value)">
                     <button onclick="sendAiCommand(document.getElementById('ai-input').value)" class="w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center active:scale-90 transition shadow-md"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
         </section>
 
-        <!-- STUDENTS -->
         <section id="students" class="view-section">
             <div class="flex justify-between items-end mb-6 px-1">
                 <div>
@@ -221,7 +270,6 @@
             <div id="students-list" class="space-y-4"></div>
         </section>
 
-        <!-- DUE FEES -->
         <section id="defaulters" class="view-section">
             <div class="flex justify-between items-end mb-6 px-1">
                 <div>
@@ -233,7 +281,6 @@
             <div id="defaulters-list" class="space-y-4"></div>
         </section>
 
-        <!-- COLLECT FEE -->
         <section id="fee" class="view-section">
             <div class="text-center mb-8 pt-4">
                 <div class="w-20 h-20 mx-auto bg-green-100 rounded-32 flex items-center justify-center mb-4 transform rotate-3 shadow-sm">
@@ -293,7 +340,6 @@
             </div>
         </section>
 
-        <!-- SETTINGS -->
         <section id="settings" class="view-section">
             <div class="flex justify-between items-center mb-6 px-1">
                 <div>
@@ -323,8 +369,11 @@
         </section>
     </main>
 
-    <!-- BOTTOM NAVIGATION (UPDATED WITH AI HUB) -->
-    <nav class="fixed bottom-0 w-full max-w-500 glass-nav flex justify-between items-end px-2 pt-2 z-40 rounded-t-3xl border-t border-gray-100 pb-safe">
+    <button onclick="navigate('fee')" class="fixed bottom-24 right-4 w-14 h-14 bg-green-500 text-white rounded-full shadow-2xl flex items-center justify-center z-50 active:scale-90 transition-transform border-4 border-white dark:border-gray-800">
+        <i class="fas fa-plus text-2xl"></i>
+    </button>
+
+    <nav class="fixed bottom-0 w-full max-w-500 glass-nav flex justify-between px-3 pt-3 pb-safe z-40 rounded-t-3xl border-t border-gray-100">
         <button onclick="navigate('dashboard')" id="nav-dashboard" class="mob-nav flex-1 flex flex-col items-center pb-2 text-indigo-600">
             <div class="w-8 h-8 flex items-center justify-center rounded-full mb-0.5 nav-icon-bg bg-indigo-50"><i class="fas fa-home text-lg"></i></div>
             <span class="text-8 font-black uppercase">Home</span>
@@ -333,25 +382,21 @@
             <div class="w-8 h-8 flex items-center justify-center rounded-full mb-0.5 nav-icon-bg"><i class="fas fa-users text-lg"></i></div>
             <span class="text-8 font-black uppercase">Students</span>
         </button>
-        
-        <div class="relative flex-1 flex justify-center pb-6">
-            <button onclick="navigate('fee')" class="absolute bottom-6 w-14 h-14 bg-green-500 text-white rounded-full shadow-lg flex items-center justify-center border-4 border-white active:scale-90 transition-transform z-10"><i class="fas fa-plus text-2xl"></i></button>
-        </div>
-        
-        <!-- NEW AI HUB BUTTON -->
+        <button onclick="navigate('attendance')" id="nav-attendance" class="mob-nav flex-1 flex flex-col items-center pb-2 text-gray-400">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full mb-0.5 nav-icon-bg"><i class="fas fa-clipboard-user text-lg"></i></div>
+            <span class="text-8 font-black uppercase">Attend</span>
+        </button>
         <button onclick="navigate('aihub')" id="nav-aihub" class="mob-nav flex-1 flex flex-col items-center pb-2 text-gray-400 relative">
             <div class="w-8 h-8 flex items-center justify-center rounded-full mb-0.5 nav-icon-bg"><i class="fas fa-robot text-lg"></i></div>
             <span class="text-8 font-black uppercase">AI Hub</span>
-            <span class="absolute top-0 right-3 bg-purple-500 text-white text-[6px] font-black px-1.5 py-0.5 rounded-full border-2 border-white animate-pulse">PRO</span>
+            <span class="absolute top-0 right-1 bg-purple-500 text-white text-[6px] font-black px-1.5 py-0.5 rounded-full border-2 border-white animate-pulse">PRO</span>
         </button>
-        
         <button onclick="navigate('settings')" id="nav-settings" class="mob-nav flex-1 flex flex-col items-center pb-2 text-gray-400">
             <div class="w-8 h-8 flex items-center justify-center rounded-full mb-0.5 nav-icon-bg"><i class="fas fa-cog text-lg"></i></div>
             <span class="text-8 font-black uppercase">Settings</span>
         </button>
     </nav>
 
-    <!-- ADD/EDIT MODAL -->
     <div id="addModal" class="fixed inset-0 bg-gray-900 bg-opacity-60 z-50 hidden flex flex-col justify-end transition-opacity duration-300">
         <div class="absolute inset-0" onclick="closeModal()"></div>
         <div class="bg-white w-full max-w-500 mx-auto rounded-t-32 px-5 pt-3 pb-8 transform transition-transform translate-y-full h-[90vh] overflow-y-auto relative premium-shadow" id="modalContent">
@@ -415,7 +460,6 @@
     </div>
 
     <script>
-        // NEW UPDATED API URL
         const API_URL = 'https://script.google.com/macros/s/AKfycbyzdhgBbbfyCBbHVN8nTr8NgBhrRi5dxhv8WdM8s0Q2SUbtEkZ3pG6gZ0Zt7MRaLrsO/exec';
 
         window.loadTimer = setTimeout(function() {
@@ -447,8 +491,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             setInterval(updateClock, 1000); updateClock();
             document.getElementById('feeMonth').value = currentMonthName;
+            document.getElementById('attDate').valueAsDate = new Date();
 
-            const cachedData = localStorage.getItem('brighttutorialsData');
+            const cachedData = localStorage.getItem('vsehData');
             if(cachedData) {
                 appData = JSON.parse(cachedData);
                 document.getElementById('globalLoader').style.display = 'none';
@@ -459,7 +504,7 @@
                 clearTimeout(window.loadTimer);
                 if(res && res.status === 'success') { 
                     appData = res;
-                    localStorage.setItem('brighttutorialsData', JSON.stringify(appData));
+                    localStorage.setItem('vsehData', JSON.stringify(appData));
                     if(!cachedData) document.getElementById('globalLoader').style.display = 'none';
                     initSettingsUI(); updateDashboard(); renderStudents(); renderDefaulters();
                 } else if(!cachedData) {
@@ -498,7 +543,6 @@
             else amtEl.innerText = '₹' + Number(amtEl.dataset.val).toLocaleString('en-IN');
         }
 
-        // UPDATED NAVIGATE LOGIC TO HANDLE AI HUB
         function navigate(id) {
             var secs = document.querySelectorAll('.view-section');
             for(var i=0; i<secs.length; i++) secs[i].classList.remove('active');
@@ -521,6 +565,7 @@
             }
             
             if(id === 'dashboard') { updateDashboard(); renderDefaulters(); }
+            if(id === 'attendance') { document.getElementById('attDate').valueAsDate = new Date(); loadAttendanceStudents(); }
             if(id === 'fee') { document.getElementById('feeForm').reset(); document.getElementById('feeDate').valueAsDate = new Date(); initFeeClasses(); document.getElementById('feeStudentId').value = ''; document.getElementById('feeStudentList').classList.add('hidden'); setMode(''); }
             if(id === 'aihub') { var chat = document.getElementById('ai-chat-history'); chat.scrollTop = chat.scrollHeight; }
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -552,6 +597,87 @@
                 
                 list.innerHTML += '<div class="glass-panel p-4 rounded-24 mb-3 flex justify-between items-center"><div class="flex items-center space-x-3"><div onclick="resendSuccess(\'' + p.studentName + '\', \'' + p.phone + '\', \'' + p.amount + '\', \'' + p.month + '\', \'' + (p.mode||'CASH') + '\')" class="w-10 h-10 bg-green-50 text-green-500 rounded-full flex items-center justify-center active:scale-90 shadow-sm"><i class="fab fa-whatsapp text-lg"></i></div><div><p class="font-black text-gray-800 text-xs force-uppercase truncate w-32">' + p.studentName + '</p><p class="text-8 font-bold text-gray-400 mt-0.5 tracking-widest">' + p.className + ' • ' + p.month.toUpperCase() + '</p></div></div><div class="text-right"><p class="font-black text-indigo-600 text-sm">₹' + p.amount + '</p><p class="text-8 font-bold text-gray-400 force-uppercase mt-0.5 tracking-widest">' + (p.mode||'CASH') + ' • ' + pDateShow + '</p></div></div>';
             }
+        }
+
+        // ==========================================
+        // ATTENDANCE LOGIC
+        // ==========================================
+        function loadAttendanceStudents() {
+            var cls = document.getElementById('attClass').value;
+            var list = document.getElementById('attendance-list');
+            list.innerHTML = '';
+            
+            if(!cls) { list.innerHTML = '<p class="text-center text-gray-400 text-xs font-bold mt-10 uppercase tracking-widest">SELECT A CLASS TO BEGIN</p>'; return; }
+            
+            var filtered = appData.students.filter(s => s.class === cls);
+            if(filtered.length === 0) { list.innerHTML = '<p class="text-center text-gray-400 text-xs font-bold mt-10 uppercase tracking-widest">NO STUDENTS IN THIS CLASS</p>'; return; }
+            
+            filtered.forEach(s => {
+                list.innerHTML += `
+                <div class="glass-panel p-3 px-4 rounded-2xl mb-3 flex justify-between items-center att-row" data-stuid="${s.id}" data-stuname="${s.name}">
+                    <div>
+                        <p class="font-black text-gray-800 text-sm force-uppercase w-32 truncate">${s.name}</p>
+                        <p class="text-8 font-bold text-gray-400 tracking-widest mt-0.5">${s.id}</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button type="button" onclick="setAttStatus(this, 'Present')" class="att-btn w-12 h-10 rounded-xl bg-gray-100 text-gray-400 font-black text-xs border-2 border-transparent">P</button>
+                        <button type="button" onclick="setAttStatus(this, 'Absent')" class="att-btn w-12 h-10 rounded-xl bg-gray-100 text-gray-400 font-black text-xs border-2 border-transparent">A</button>
+                    </div>
+                </div>`;
+            });
+        }
+
+        function setAttStatus(btn, status) {
+            var parent = btn.parentElement;
+            var btns = parent.querySelectorAll('.att-btn');
+            btns.forEach(b => b.removeAttribute('data-selected'));
+            btn.setAttribute('data-selected', status);
+        }
+
+        function markAllPresent() {
+            var rows = document.querySelectorAll('#attendance-list .att-row');
+            if(rows.length === 0) return;
+            rows.forEach(row => {
+                var pBtn = row.querySelectorAll('.att-btn')[0];
+                setAttStatus(pBtn, 'Present');
+            });
+            showToast('ALL MARKED PRESENT');
+        }
+
+        function submitAttendance() {
+            var cls = document.getElementById('attClass').value;
+            var dt = document.getElementById('attDate').value;
+            if(!cls || !dt) { alert('Please select a class and date.'); return; }
+
+            var rows = document.querySelectorAll('#attendance-list .att-row');
+            if(rows.length === 0) return;
+
+            var records = [];
+            var rawD = dt.split('-');
+            var formatDt = rawD[2] + "-" + rawD[1] + "-" + rawD[0];
+            var monthName = new Date(dt).toLocaleString('default', { month: 'long' });
+
+            for(var i=0; i<rows.length; i++) {
+                var row = rows[i];
+                var selBtn = row.querySelector('.att-btn[data-selected]');
+                if(!selBtn) { alert('Please mark Present/Absent for all students before saving.'); return; }
+                
+                records.push({
+                    id: 'ATT-' + Date.now().toString().slice(-5) + i,
+                    studentId: row.getAttribute('data-stuid'),
+                    studentName: row.getAttribute('data-stuname'),
+                    class: cls,
+                    date: formatDt,
+                    month: monthName,
+                    status: selBtn.getAttribute('data-selected')
+                });
+            }
+
+            appData.attendance = appData.attendance.concat(records);
+            localStorage.setItem('vsehData', JSON.stringify(appData));
+            showToast('ATTENDANCE SAVED');
+            gasApi('saveAttendanceBatch', records);
+            loadAttendanceStudents(); 
         }
 
         function renderStudents() {
@@ -648,7 +774,7 @@
                 if(trimmedClass !== '') newFees[trimmedClass] = amounts[i].value;
             }
             appData.feeSettings = newFees; 
-            localStorage.setItem('brighttutorialsData', JSON.stringify(appData));
+            localStorage.setItem('vsehData', JSON.stringify(appData));
             initFeeClasses(); showToast('SETTINGS UPDATED'); 
             if(!setLocked) toggleSetLock();
             gasApi('saveFeeSettings', newFees);
@@ -659,6 +785,7 @@
             for(var c in appData.feeSettings) opts += '<option value="' + c + '">' + c + '</option>';
             if(document.getElementById('stuClass')) document.getElementById('stuClass').innerHTML = opts;
             if(document.getElementById('feeClass')) document.getElementById('feeClass').innerHTML = opts;
+            if(document.getElementById('attClass')) document.getElementById('attClass').innerHTML = opts;
         }
         function autoFillSetupFee() { document.getElementById('stuFee').value = appData.feeSettings[document.getElementById('stuClass').value] || ''; }
 
@@ -756,7 +883,7 @@
                 var id = document.getElementById('stuId').value, rowIndex = document.getElementById('stuRowIndex').value;
                 var newList = []; for(var i=0; i<appData.students.length; i++) if(appData.students[i].id !== id) newList.push(appData.students[i]);
                 appData.students = newList; 
-                localStorage.setItem('brighttutorialsData', JSON.stringify(appData));
+                localStorage.setItem('vsehData', JSON.stringify(appData));
                 renderStudents(); updateDashboard(); renderDefaulters(); showToast('PROFILE DELETED');
                 closeModal(); 
                 gasApi('deleteStudent', {rowIndex: rowIndex});
@@ -784,11 +911,11 @@
             if(isEdit) { for(var k=0; k<appData.students.length; k++) { if(appData.students[k].id === newStu.id) { appData.students[k] = newStu; break; } } } 
             else { appData.students.push(newStu); }
             
-            localStorage.setItem('brighttutorialsData', JSON.stringify(appData));
+            localStorage.setItem('vsehData', JSON.stringify(appData));
             renderStudents(); updateDashboard(); renderDefaulters(); closeModal(); showToast('DATA SYNCED');
             
             gasApi('saveStudent', newStu).then(r => {
-                if(r && r.status==='success') { appData = r; localStorage.setItem('brighttutorialsData', JSON.stringify(appData)); }
+                if(r && r.status==='success') { appData = r; localStorage.setItem('vsehData', JSON.stringify(appData)); }
             });
         }
 
@@ -851,7 +978,7 @@
                 if(!isPaid) appData.paidCount++;
             }
             
-            localStorage.setItem('brighttutorialsData', JSON.stringify(appData));
+            localStorage.setItem('vsehData', JSON.stringify(appData));
             updateDashboard(); renderDefaulters(); showToast('FEE RECORDED'); navigate('dashboard');
             sendSuccessMsg(st.name, st.phone, amt, mnth, currentMode);
             
@@ -927,14 +1054,14 @@
         }
 
         // ==========================================
-        // ADVANCED AI COPILOT FRONTEND LOGIC
+        // ADVANCED AI COPILOT FRONTEND LOGIC (WITH MARKDOWN FIX)
         // ==========================================
         function simulateAudioInput() {
             var msg = "Listening...";
             document.getElementById('ai-input').value = msg;
             setTimeout(() => {
                 document.getElementById('ai-input').value = "";
-                sendAiCommand("Mark Anurag absent today and rest present in Class 10");
+                sendAiCommand("Mark everyone present in Class 10th but Anurag absent.");
             }, 2000);
         }
 
@@ -959,7 +1086,6 @@
             if(res && res.status === 'success') {
                 renderAiResponse(res.result);
             } else {
-                // 🔥 FIX: Show the ACTUAL error message coming from the backend
                 let actualError = (res && res.message) ? res.message : "Unknown API issue";
                 chat.innerHTML += `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-red-500 max-w-[85%] mb-4"><p class="text-xs font-bold text-red-600">Error: ${actualError}</p></div>`;
             }
@@ -970,26 +1096,17 @@
             let chat = document.getElementById('ai-chat-history');
             let html = '';
             
-            if(res.intent === 'DAILY_TODO') {
-                let tasks = (res.tasks || []).map(t => `<li class="flex items-start mb-2"><i class="fas fa-check-circle text-purple-500 mt-0.5 mr-2"></i><span>${t}</span></li>`).join('');
-                html = `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-purple-500 mb-4 shadow-sm"><h4 class="font-black text-sm text-gray-800 dark:text-white mb-3">${res.greeting}</h4><ul class="text-xs font-bold text-gray-600 dark:text-gray-300">${tasks}</ul></div>`;
-            } 
-            else if(res.intent === 'TEST_GENERATION') {
-                html = `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-indigo-500 mb-4 shadow-sm"><h4 class="font-black text-sm text-gray-800 dark:text-white mb-2">Generated Test (${res.totalMarks} Marks)</h4><div class="text-xs text-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 max-h-40 overflow-y-auto mt-2">${res.html}</div><button onclick="showToast('Test Copied to Clipboard!')" class="mt-3 w-full bg-indigo-50 text-indigo-600 py-2 rounded-xl font-black text-10 uppercase active:scale-95 transition"><i class="fas fa-copy mr-1"></i> Copy HTML</button></div>`;
-            }
-            else if(res.intent === 'REVENUE_PROJECTION') {
-                html = `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-green-500 mb-4 shadow-sm"><h4 class="font-black text-sm text-gray-800 dark:text-white mb-2">Revenue Insights</h4><p class="text-2xl font-black text-green-600 mb-2">₹${res.expected30Days}</p><p class="text-xs font-bold text-gray-600 dark:text-gray-300">${res.insights}</p></div>`;
-            }
-            else if(res.intent === 'ATTENDANCE_BATCH') {
-                html = `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-blue-500 mb-4 shadow-sm"><h4 class="font-black text-sm text-gray-800 dark:text-white mb-2">Attendance Marked</h4><p class="text-xs font-bold text-gray-600 dark:text-gray-300">Processed records successfully.</p></div>`;
-            }
-            else if(res.intent === 'CLASS_SUMMARY_ABSENTEES') {
-                 html = `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-yellow-500 mb-4 shadow-sm"><h4 class="font-black text-sm text-gray-800 dark:text-white mb-2">Summary Broadcast Ready</h4><p class="text-xs font-bold text-gray-600 dark:text-gray-300 mb-3">AI generated note for absentees.</p><button onclick="window.open('https://wa.me/?text=${encodeURIComponent(res.whatsappMessage)}')" class="w-full bg-green-500 text-white py-3 rounded-xl font-black text-10 uppercase active:scale-95 transition shadow-md"><i class="fab fa-whatsapp text-sm mr-1"></i> Send to Absentees</button></div>`;
-            }
-            else {
-                let text = res.message || res.replyMessage || res.suggestionText || res.reasoning || JSON.stringify(res);
-                html = `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-purple-500 mb-4 shadow-sm"><p class="text-xs font-bold text-gray-700 dark:text-gray-200">${text}</p></div>`;
-            }
+            // Format Markdown (Bold and Line breaks) since backend now sends raw text
+            let formatText = (txt) => {
+                if(!txt) return '';
+                return txt.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                          .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                          .replace(/\n/g, '<br>');
+            };
+
+            let text = res.message || res.replyMessage || res.suggestionText || res.reasoning || JSON.stringify(res);
+            
+            html = `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-purple-500 mb-4 shadow-sm"><p class="text-xs text-gray-800 dark:text-gray-200" style="line-height: 1.6;">${formatText(text)}</p></div>`;
             
             chat.innerHTML += html;
             chat.scrollTop = chat.scrollHeight;
