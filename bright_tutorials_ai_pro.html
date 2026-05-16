@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>BRIGHT TUTORAILS PRO</title>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    
+    <style>
+        body { 
+            -webkit-tap-highlight-color: transparent; 
+            background-color: #f4f7fe; 
+            font-family: 'Outfit', sans-serif; 
+            overscroll-behavior-y: none;
+            transition: background-color 0.3s ease;
+        }
+        
+        .text-7 { font-size: 7px; line-height: 9px; }
+        .text-8 { font-size: 8px; line-height: 10px; }
+        .text-9 { font-size: 9px; line-height: 12px; }
+        .text-10 { font-size: 10px; line-height: 14px; }
+        .text-11 { font-size: 11px; line-height: 16px; }
+        
+        .rounded-24 { border-radius: 24px; }
+        .rounded-32 { border-radius: 32px; }
+        .max-w-500 { max-width: 500px; margin: 0 auto; }
+        
+        .view-section { display: none; padding-bottom: 120px; padding-top: 10px; }
+        .view-section.active { display: block; animation: fadeUp 0.3s ease-out forwards; }
+        
+        @keyframes fadeUp { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .blink { animation: pulse-soft 1.5s infinite; }
+        
+        .force-uppercase { text-transform: uppercase; }
+        ::-webkit-scrollbar { display: none; }
+        
+        .glass-panel { 
+            background: rgba(255, 255, 255, 0.9); 
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .glass-nav { 
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 -5px 25px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .grad-card-1 { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+        .grad-card-2 { background: linear-gradient(135deg, #10b981, #3b82f6); }
+        .grad-card-3 { background: linear-gradient(135deg, #f43f5e, #f97316); }
+        .text-grad { background: linear-gradient(to right, #7c3aed, #4f46e5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .mobile-input {
+            background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px;
+            padding: 14px 16px; font-size: 13px !important; font-weight: 700; width: 100%;
+            color: #1e293b; outline: none; transition: all 0.3s;
+        }
+        .mobile-input:focus { border-color: #6366f1; background: #ffffff; box-shadow: 0 0 0 4px rgba(99,102,241,0.1); }
+        .mobile-input:read-only, .mobile-input:disabled { background-color: #f1f5f9; color: #94a3b8; cursor: not-allowed; border-color: #e2e8f0; opacity: 0.8; }
+        
+        .drag-handle { width: 45px; height: 5px; background: #cbd5e1; border-radius: 5px; margin: 0 auto 20px auto; }
+
+        body.dark-mode { background-color: #0f172a; color: #f1f5f9; }
+        body.dark-mode .glass-panel { background: rgba(30, 41, 59, 0.95); border-color: #334155; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5); }
+        body.dark-mode .glass-nav { background: #1e293b; border-color: #334155; }
+        body.dark-mode .bg-white { background-color: #1e293b !important; border-color: #334155 !important; color: #f8fafc; }
+        body.dark-mode .text-gray-800, body.dark-mode .text-gray-900 { color: #f1f5f9 !important; }
+        body.dark-mode .text-gray-500, body.dark-mode .text-gray-400 { color: #94a3b8 !important; }
+        body.dark-mode .text-indigo-900 { color: #818cf8 !important; }
+        body.dark-mode .bg-gray-50 { background-color: #0f172a !important; border-color: #334155 !important; color: #f8fafc !important; }
+        body.dark-mode .bg-gray-100 { background-color: #334155 !important; }
+        body.dark-mode .border-gray-100, body.dark-mode .border-gray-200 { border-color: #334155 !important; }
+        body.dark-mode .mobile-input { background-color: #0f172a !important; border-color: #334155 !important; color: #f8fafc !important; }
+        body.dark-mode .mobile-input:focus { border-color: #818cf8 !important; box-shadow: 0 0 0 4px rgba(129,140,248,0.2) !important; }
+        body.dark-mode #modalContent { background-color: #1e293b !important; }
+        body.dark-mode .mode-btn { background-color: #0f172a !important; border-color: #334155 !important; color: #94a3b8 !important; }
+        body.dark-mode .mode-btn.border-indigo-200 { background-color: rgba(99,102,241,0.1) !important; border-color: #818cf8 !important; color: #818cf8 !important; }
+        body.dark-mode .text-grad { background: linear-gradient(to right, #a78bfa, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden w-full max-w-500 relative transition-colors duration-300">
+
+    <div id="toast" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[100] transition-all duration-300 opacity-0 pointer-events-none w-11/12" style="max-width: 400px;">
+        <div class="bg-gray-900 text-white px-5 py-3.5 rounded-full shadow-2xl flex items-center justify-center text-xs font-black uppercase tracking-widest border border-gray-700">
+            <i class="fas fa-check-circle text-green-400 mr-2 text-lg"></i> <span id="toastMsg">Synced Successfully</span>
+        </div>
+    </div>
+
+    <div id="globalLoader" class="fixed inset-0 bg-[#f4f7fe] dark-target z-[999] flex flex-col items-center justify-center p-6 text-center">
+        <div class="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-5"></div>
+        <p class="text-indigo-600 font-black tracking-widest text-sm animate-pulse uppercase">INITIALIZING...</p>
+        <div id="errorBox" class="hidden w-full bg-red-50 border-2 border-red-200 p-5 rounded-2xl mt-6 shadow-xl"></div>
+    </div>
+
+    <header class="glass-panel mx-4 mt-4 mb-2 rounded-3xl z-20 flex justify-between items-start p-4">
+        <div class="flex flex-col flex-1 min-w-0 pr-2">
+            <h1 class="text-xl font-black tracking-tight text-grad uppercase leading-tight whitespace-normal break-words">BRIGHT TUTORAILS</h1>
+            <div class="flex items-center space-x-1.5 text-8 font-black text-gray-400 uppercase mt-1 tracking-widest whitespace-nowrap overflow-hidden">
+                <i class="far fa-calendar-alt"></i> <span id="headerDate">--/--/----</span>
+                <span class="text-gray-300">|</span>
+                <i class="far fa-clock"></i> <span id="headerTime">00:00</span>
+            </div>
+        </div>
+        <div class="flex flex-col items-end shrink-0 mt-0.5">
+            <div class="flex items-center bg-red-50 text-red-600 px-1.5 py-0.5 rounded border border-red-100 blink shadow-sm mb-1">
+                <span class="w-1 h-1 bg-red-600 rounded-full mr-1"></span>
+                <span class="text-[7px] font-black uppercase tracking-widest leading-none mt-0.5">AI PRO</span>
+            </div>
+            <span class="font-bold text-gray-400 uppercase tracking-widest" style="font-size: 7px; white-space: nowrap;">Created by Guna</span>
+        </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-4 w-full">
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="view-section active">
+            <div class="flex justify-between items-end mb-4 px-1">
+                <h2 class="text-2xl font-black text-gray-800 tracking-tight">Overview</h2>
+                <span class="text-10 font-black text-indigo-600 bg-indigo-100 px-2.5 py-1 rounded-lg uppercase">Dashboard</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div class="grad-card-1 p-5 rounded-24 shadow-lg text-white">
+                    <div class="w-8 h-8 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mb-3"><i class="fas fa-users text-sm"></i></div>
+                    <p class="text-9 font-black opacity-80 uppercase tracking-widest">TOTAL STUDENTS</p>
+                    <p class="text-3xl font-black mt-1" id="dash-all">0</p>
+                </div>
+                <div class="grad-card-2 p-5 rounded-24 shadow-lg text-white">
+                    <div class="w-8 h-8 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mb-3"><i class="fas fa-check-double text-sm"></i></div>
+                    <p class="text-9 font-black opacity-80 uppercase tracking-widest">PAID THIS MONTH</p>
+                    <p class="text-3xl font-black mt-1" id="dash-paid">0</p>
+                </div>
+                <div class="grad-card-3 p-5 rounded-24 shadow-lg text-white col-span-2 relative overflow-hidden">
+                    <div class="absolute right-0 top-0 w-32 h-32 bg-white bg-opacity-10 rounded-full blur-2xl"></div>
+                    <div class="relative z-10 w-full">
+                        <div class="flex justify-between items-center w-full mb-1">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-white bg-opacity-20 rounded-lg flex items-center justify-center"><i class="fas fa-wallet text-10"></i></div>
+                                <p class="text-10 font-black opacity-90 uppercase tracking-widest">COLLECTED REVENUE</p>
+                            </div>
+                            <button onclick="toggleRevenue()" class="p-2 active:scale-90 transition"><i id="revenue-eye" class="fas fa-eye-slash text-white opacity-80 text-lg"></i></button>
+                        </div>
+                        <p class="text-4xl font-black" id="dash-amt" data-val="0">₹ •••••</p>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-24 shadow-sm border border-gray-100 col-span-2 flex justify-between items-center relative overflow-hidden">
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-red-500"></div>
+                    <div class="ml-2">
+                        <p class="text-10 font-black text-gray-400 uppercase tracking-widest mb-1">PENDING STUDENTS FEES</p>
+                        <p class="text-xl font-black text-gray-800" id="dash-pend">0 <span class="text-xs text-gray-400 font-bold ml-1">Students</span></p>
+                    </div>
+                    <button onclick="navigate('defaulters')" class="w-10 h-10 bg-red-50 text-red-600 rounded-xl flex items-center justify-center active:scale-90 transition"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <h3 class="text-10 font-black text-gray-500 tracking-widest uppercase mb-3 px-1"><i class="fas fa-bolt text-yellow-500 mr-1.5"></i> RECENT PAYMENTS</h3>
+            <div id="recent-list" class="space-y-3"></div>
+        </section>
+
+        <!-- AI HUB SECTION (NEW) -->
+        <section id="aihub" class="view-section relative">
+            <div class="flex justify-between items-end mb-4 px-1">
+                <div>
+                    <h2 class="text-2xl font-black text-purple-600 tracking-tight">AI Co-Pilot</h2>
+                    <p class="text-10 font-black text-gray-400 uppercase tracking-widest mt-1">Advanced 10+ Features</p>
+                </div>
+                <span class="text-10 font-black text-white bg-purple-600 px-2.5 py-1 rounded-lg uppercase shadow-md"><i class="fas fa-brain mr-1"></i> Gemini Active</span>
+            </div>
+            
+            <div id="ai-chat-history" class="space-y-4 mb-20 overflow-y-auto" style="height: 55vh;">
+                <!-- Welcome message -->
+                <div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-purple-500 shadow-sm">
+                    <p class="text-xs font-bold text-gray-700 dark:text-gray-200">Hello Vijay Sir! Main aapka autonomous AI Assistant hoon. Main aapki har operations aur management me madad karunga.</p>
+                    <div class="flex flex-wrap gap-2 mt-3">
+                        <button onclick="sendAiCommand('Show my daily todo list')" class="text-9 bg-purple-50 text-purple-600 px-3 py-1.5 rounded-lg font-black uppercase active:scale-95 transition border border-purple-100"><i class="fas fa-list-check mr-1"></i> Daily To-Do</button>
+                        <button onclick="sendAiCommand('Generate 20 marks test for Class 10')" class="text-9 bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-lg font-black uppercase active:scale-95 transition border border-indigo-100"><i class="fas fa-file-signature mr-1"></i> Create Test</button>
+                        <button onclick="sendAiCommand('Revenue projection for next 30 days')" class="text-9 bg-green-50 text-green-600 px-3 py-1.5 rounded-lg font-black uppercase active:scale-95 transition border border-green-100"><i class="fas fa-chart-line mr-1"></i> Revenue Forecast</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input Anchor -->
+            <div class="fixed bottom-20 left-4 right-4 max-w-500 mx-auto z-30 pb-2">
+                <div class="glass-panel rounded-full p-1.5 flex items-center shadow-xl border border-gray-200 dark:border-gray-700">
+                    <button onclick="simulateAudioInput()" class="w-10 h-10 text-gray-400 hover:text-purple-600 flex items-center justify-center transition"><i class="fas fa-microphone"></i></button>
+                    <input type="text" id="ai-input" placeholder="Type prompt (e.g. Generate test...)" class="flex-1 bg-transparent border-none outline-none px-2 text-sm font-bold text-gray-700 dark:text-gray-200" onkeypress="if(event.key === 'Enter') sendAiCommand(this.value)">
+                    <button onclick="sendAiCommand(document.getElementById('ai-input').value)" class="w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center active:scale-90 transition shadow-md"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </section>
+
+        <!-- STUDENTS -->
+        <section id="students" class="view-section">
+            <div class="flex justify-between items-end mb-6 px-1">
+                <div>
+                    <h2 class="text-2xl font-black text-gray-800 tracking-tight">Directory</h2>
+                    <p class="text-10 font-black text-gray-400 uppercase tracking-widest mt-1">All Students</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="generateStudentsPDF()" class="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 px-4 py-3 rounded-2xl font-black text-xs shadow-sm active:scale-95 transition flex items-center border border-gray-200 dark:border-slate-700 uppercase tracking-wider">
+                        <i class="fas fa-file-pdf mr-2 text-red-500 text-sm"></i> Get PDF
+                    </button>
+                    <button onclick="openModal()" class="bg-indigo-600 text-white px-4 py-3 rounded-2xl font-black text-xs shadow-lg active:scale-95 transition flex items-center uppercase tracking-wider"><i class="fas fa-user-plus mr-2"></i> ADD</button>
+                </div>
+            </div>
+            <div class="relative mb-6">
+                <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-gray-400 text-lg"></i>
+                </div>
+                <input type="text" id="searchInput" oninput="renderStudents()" placeholder="SEARCH BY NAME OR PHONE..." class="mobile-input force-uppercase shadow-sm w-full" style="padding-left: 3.2rem;">
+            </div>
+            <div id="students-list" class="space-y-4"></div>
+        </section>
+
+        <!-- DUE FEES -->
+        <section id="defaulters" class="view-section">
+            <div class="flex justify-between items-end mb-6 px-1">
+                <div>
+                    <h2 class="text-2xl font-black text-red-600 tracking-tight">Pending Dues</h2>
+                    <p class="text-10 font-black text-gray-400 uppercase tracking-widest mt-1">>30 DAYS UNPAID</p>
+                </div>
+                <div class="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-600"><i class="fas fa-exclamation-triangle text-xl"></i></div>
+            </div>
+            <div id="defaulters-list" class="space-y-4"></div>
+        </section>
+
+        <!-- COLLECT FEE -->
+        <section id="fee" class="view-section">
+            <div class="text-center mb-8 pt-4">
+                <div class="w-20 h-20 mx-auto bg-green-100 rounded-32 flex items-center justify-center mb-4 transform rotate-3 shadow-sm">
+                    <i class="fas fa-rupee-sign text-4xl text-green-600 transform -rotate-3"></i>
+                </div>
+                <h2 class="text-2xl font-black text-gray-800 tracking-tight">Collect Fee</h2>
+                <p class="text-10 font-black text-gray-400 uppercase tracking-widest mt-1">SECURE PAYMENT ENTRY</p>
+            </div>
+            
+            <div class="glass-panel rounded-32 p-6">
+                <form id="feeForm" onsubmit="processFee(event)" class="space-y-5">
+                    <div>
+                        <label class="block text-10 font-black text-gray-500 uppercase tracking-widest ml-1 mb-1.5">SELECT CLASS (OPTIONAL)</label>
+                        <select id="feeClass" onchange="populateFeeStudents()" class="mobile-input bg-gray-50"><option value="">-- ALL CLASSES --</option></select>
+                    </div>
+                    <div>
+                        <label class="block text-10 font-black text-gray-500 uppercase tracking-widest ml-1 mb-1.5">SEARCH STUDENT</label>
+                        <div class="relative">
+                            <input type="text" id="feeStudentSearch" oninput="filterFeeStudents()" placeholder="START TYPING NAME..." class="mobile-input force-uppercase bg-gray-50" autocomplete="off">
+                            <div id="feeStudentList" class="hidden absolute top-full left-0 right-0 bg-white shadow-2xl border border-gray-100 rounded-xl mt-1 z-50 max-h-48 overflow-y-auto p-2"></div>
+                            <input type="hidden" id="feeStudentId" required>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-10 font-black text-gray-500 uppercase tracking-widest ml-1 mb-1.5">FEE MONTH</label>
+                            <select id="feeMonth" required class="mobile-input bg-gray-50 force-uppercase"><option value="January">Jan</option><option value="February">Feb</option><option value="March">Mar</option><option value="April">Apr</option><option value="May">May</option><option value="June">Jun</option><option value="July">Jul</option><option value="August">Aug</option><option value="September">Sep</option><option value="October">Oct</option><option value="November">Nov</option><option value="December">Dec</option></select>
+                        </div>
+                        <div>
+                            <label class="block text-10 font-black text-gray-500 uppercase tracking-widest ml-1 mb-1.5">DATE</label>
+                            <input type="date" id="feeDate" required class="mobile-input bg-gray-50 text-xs">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-10 font-black text-gray-500 uppercase tracking-widest ml-1 mb-1.5">COLLECTED AMOUNT (₹)</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <span class="text-green-500 font-black text-lg">₹</span>
+                            </div>
+                            <input type="number" inputmode="numeric" id="feeAmount" required class="mobile-input bg-green-50 text-green-600 text-xl tracking-wider border-green-200" style="padding-left: 2.5rem;">
+                        </div>
+                    </div>
+                    
+                    <div class="pt-2">
+                        <label class="block text-10 font-black text-gray-500 uppercase tracking-widest ml-1 mb-2">PAYMENT MODE</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" onclick="setMode('ONLINE / UPI')" id="mode-UPI" class="mode-btn bg-gray-50 py-3.5 rounded-xl text-11 font-black border-2 border-gray-200 text-gray-500 uppercase flex justify-center items-center"><i class="fas fa-qrcode mr-2 text-lg"></i> ONLINE</button>
+                            <button type="button" onclick="setMode('CASH')" id="mode-CASH" class="mode-btn bg-gray-50 py-3.5 rounded-xl text-11 font-black border-2 border-gray-200 text-gray-500 uppercase flex justify-center items-center"><i class="fas fa-money-bill-wave mr-2 text-lg"></i> CASH</button>
+                            <input type="hidden" id="feeMode" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-green-500 text-white py-4 rounded-xl font-black text-sm mt-6 shadow-lg active:scale-95 transition uppercase tracking-widest flex items-center justify-center">
+                        SAVE & WHATSAPP <i class="fab fa-whatsapp ml-2 text-lg"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="settings" class="view-section">
+            <div class="flex justify-between items-center mb-6 px-1">
+                <div>
+                    <h2 class="text-2xl font-black text-gray-800 tracking-tight">Configuration</h2>
+                    <p class="text-10 font-black text-gray-400 uppercase tracking-widest mt-1">Manage Class Fees</p>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <button onclick="toggleTheme()" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 active:scale-90 transition shadow-inner">
+                        <i id="theme-icon" class="fas fa-moon text-sm"></i>
+                    </button>
+                    <div class="flex items-center space-x-2 bg-white px-3 py-1.5 rounded-xl shadow-sm border border-gray-100">
+                        <span class="text-9 font-black text-gray-400 uppercase tracking-widest" id="set-lock-label">LOCKED</span>
+                        <button onclick="toggleSetLock()" id="set-lock-btn" class="w-10 h-6 bg-gray-300 rounded-full relative transition-all duration-300 shadow-inner">
+                            <div class="w-5 h-5 bg-white rounded-full absolute left-0.5 top-0.5 transition-all shadow-sm" id="set-lock-thumb"></div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="glass-panel rounded-32 p-6">
+                <form id="settingsForm" onsubmit="saveSettings(event)">
+                    <div id="dynamicClassesBox" class="space-y-4"></div>
+                    <button type="button" onclick="addNewClassInput()" id="btn-add-cls" disabled class="w-full bg-indigo-50 text-indigo-600 py-3 rounded-xl font-black text-xs mt-4 uppercase disabled:hidden transition-all"><i class="fas fa-plus mr-2"></i> ADD NEW CLASS TIER</button>
+                    <button type="submit" id="btn-save-set" disabled class="w-full bg-gray-900 text-white py-5 rounded-2xl font-black mt-6 disabled:opacity-30 transition-all text-xs tracking-widest uppercase shadow-lg active:scale-95">UPDATE SETTINGS</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- BOTTOM NAVIGATION (UPDATED WITH AI HUB) -->
+    <nav class="fixed bottom-0 w-full max-w-500 glass-nav flex justify-between items-end px-2 pt-2 z-40 rounded-t-3xl border-t border-gray-100 pb-safe">
+        <button onclick="navigate('dashboard')" id="nav-dashboard" class="mob-nav flex-1 flex flex-col items-center pb-2 text-indigo-600">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full mb-0.5 nav-icon-bg bg-indigo-50"><i class="fas fa-home text-lg"></i></div>
+            <span class="text-8 font-black uppercase">Home</span>
+        </button>
+        <button onclick="navigate('students')" id="nav-students" class="mob-nav flex-1 flex flex-col items-center pb-2 text-gray-400">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full mb-0.5 nav-icon-bg"><i class="fas fa-users text-lg"></i></div>
+            <span class="text-8 font-black uppercase">Students</span>
+        </button>
+        
+        <div class="relative flex-1 flex justify-center pb-6">
+            <button onclick="navigate('fee')" class="absolute bottom-6 w-14 h-14 bg-green-500 text-white rounded-full shadow-lg flex items-center justify-center border-4 border-white active:scale-90 transition-transform z-10"><i class="fas fa-plus text-2xl"></i></button>
+        </div>
+        
+        <!-- NEW AI HUB BUTTON -->
+        <button onclick="navigate('aihub')" id="nav-aihub" class="mob-nav flex-1 flex flex-col items-center pb-2 text-gray-400 relative">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full mb-0.5 nav-icon-bg"><i class="fas fa-robot text-lg"></i></div>
+            <span class="text-8 font-black uppercase">AI Hub</span>
+            <span class="absolute top-0 right-3 bg-purple-500 text-white text-[6px] font-black px-1.5 py-0.5 rounded-full border-2 border-white animate-pulse">PRO</span>
+        </button>
+        
+        <button onclick="navigate('settings')" id="nav-settings" class="mob-nav flex-1 flex flex-col items-center pb-2 text-gray-400">
+            <div class="w-8 h-8 flex items-center justify-center rounded-full mb-0.5 nav-icon-bg"><i class="fas fa-cog text-lg"></i></div>
+            <span class="text-8 font-black uppercase">Settings</span>
+        </button>
+    </nav>
+
+    <!-- ADD/EDIT MODAL -->
+    <div id="addModal" class="fixed inset-0 bg-gray-900 bg-opacity-60 z-50 hidden flex flex-col justify-end transition-opacity duration-300">
+        <div class="absolute inset-0" onclick="closeModal()"></div>
+        <div class="bg-white w-full max-w-500 mx-auto rounded-t-32 px-5 pt-3 pb-8 transform transition-transform translate-y-full h-[90vh] overflow-y-auto relative premium-shadow" id="modalContent">
+            <div class="drag-handle"></div>
+            
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-black text-gray-800 uppercase" id="modalTitle">Registration</h3>
+                <div class="flex items-center space-x-3">
+                    <button type="button" id="modalLockBtn" onclick="toggleModalLock()" class="hidden w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 active:scale-90 shadow-sm transition"><i id="modalLockIcon" class="fas fa-lock"></i></button>
+                    <button type="button" onclick="closeModal()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 active:scale-90"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            
+            <form id="addForm" onsubmit="saveStudentToServer(event)" class="space-y-4">
+                <input type="hidden" id="stuId"><input type="hidden" id="stuRowIndex">
+                
+                <div>
+                    <label class="block text-10 font-black text-gray-400 uppercase ml-1 mb-1">Full Name</label>
+                    <input type="text" id="stuName" required class="mobile-input force-uppercase" placeholder="STUDENT NAME" oninput="autoGuessGender()">
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-10 font-black text-gray-400 uppercase ml-1 mb-1">Gender</label>
+                        <select id="stuGender" required class="mobile-input bg-white force-uppercase">
+                            <option value="" disabled selected>-- SELECT --</option>
+                            <option value="Male">MALE</option><option value="Female">FEMALE</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-10 font-black text-gray-400 uppercase ml-1 mb-1">Class</label>
+                        <select id="stuClass" required onchange="autoFillSetupFee()" class="mobile-input bg-white"><option value="">-- SELECT --</option></select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-10 font-black text-gray-400 uppercase ml-1 mb-1">WhatsApp Mobile</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <span class="text-sm font-black text-gray-400">+91</span>
+                        </div>
+                        <input type="tel" inputmode="numeric" id="stuPhone" required pattern="[0-9]{10}" maxlength="10" class="mobile-input tracking-widest" placeholder="9876543210" style="padding-left: 3rem;" oninput="this.value=this.value.replace(/[^0-9]/g,''); validatePhone(this)">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div><label class="block text-10 font-black text-gray-400 uppercase ml-1 mb-1">Fee (₹)</label><input type="number" inputmode="numeric" id="stuFee" required class="mobile-input border-indigo-200 bg-indigo-50 text-indigo-700 text-lg"></div>
+                    <div><label class="block text-10 font-black text-gray-400 uppercase ml-1 mb-1">Join Date <span class="text-8 normal-case">(DD/MM/YYYY)</span></label><input type="date" id="stuDate" required class="mobile-input text-11 p-[13px]"></div>
+                </div>
+                
+                <div id="deleteBox" class="hidden mt-6 pt-5 border-t border-gray-100">
+                    <div class="bg-red-50 p-3 rounded-20 flex justify-between items-center border border-red-100">
+                        <button type="button" onclick="toggleDelLock()" id="del-lock-btn" class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-gray-400 shadow-sm"><i class="fas fa-lock" id="del-lock-icon"></i></button>
+                        <button type="button" id="btn-actual-del" disabled onclick="confirmDeleteFromModal()" class="bg-red-500 text-white px-5 py-3 rounded-xl font-black text-xs uppercase opacity-40 active:scale-95">Delete Data</button>
+                    </div>
+                </div>
+
+                <button type="submit" id="modalSaveBtn" class="w-full bg-gray-900 text-white py-4 rounded-xl font-black text-sm mt-6 active:scale-95 shadow-lg uppercase tracking-widest transition">Save Profile</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // NEW UPDATED API URL
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyzdhgBbbfyCBbHVN8nTr8NgBhrRi5dxhv8WdM8s0Q2SUbtEkZ3pG6gZ0Zt7MRaLrsO/exec';
+
+        window.loadTimer = setTimeout(function() {
+            var gl = document.getElementById('globalLoader');
+            if(gl.style.display !== 'none') {
+                document.getElementById('errorBox').classList.remove('hidden');
+                document.getElementById('errorBox').innerHTML = '<p class="text-xs font-bold text-red-600 uppercase tracking-widest text-center">Timeout! Check API Connection.</p>';
+            }
+        }, 12000);
+
+        var appData = { students: [], payments: [], attendance: [], feeSettings: {}, paidCount: 0 };
+        var currentMonthName = new Date().toLocaleString('default', { month: 'long' });
+        var currentMode = ''; 
+        var setLocked = true; 
+        var delLocked = true;
+        var modalLocked = false; 
+        var isRevenueHidden = true;
+
+        async function gasApi(action, payload = null) {
+            try {
+                let url = API_URL + "?action=" + action;
+                let options = { method: "GET" };
+                if (payload) options = { method: "POST", body: JSON.stringify({ action: action, data: payload }) };
+                const response = await fetch(url, options);
+                return await response.json();
+            } catch(e) { console.error("API Error:", e); return null; }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            setInterval(updateClock, 1000); updateClock();
+            document.getElementById('feeMonth').value = currentMonthName;
+
+            const cachedData = localStorage.getItem('brighttutorialsData');
+            if(cachedData) {
+                appData = JSON.parse(cachedData);
+                document.getElementById('globalLoader').style.display = 'none';
+                initSettingsUI(); updateDashboard(); renderStudents(); renderDefaulters();
+            }
+
+            gasApi('getAppData').then(function(res) {
+                clearTimeout(window.loadTimer);
+                if(res && res.status === 'success') { 
+                    appData = res;
+                    localStorage.setItem('brighttutorialsData', JSON.stringify(appData));
+                    if(!cachedData) document.getElementById('globalLoader').style.display = 'none';
+                    initSettingsUI(); updateDashboard(); renderStudents(); renderDefaulters();
+                } else if(!cachedData) {
+                    alert(res ? res.message : "Failed to load data from server");
+                }
+            });
+        });
+
+        function updateClock() {
+            var now = new Date();
+            var d = ("0" + now.getDate()).slice(-2), m = ("0" + (now.getMonth() + 1)).slice(-2), y = now.getFullYear();
+            document.getElementById('headerDate').innerText = d + "/" + m + "/" + y;
+            document.getElementById('headerTime').innerText = now.toLocaleTimeString('en-GB', { hour12: true });
+        }
+
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            t.style.top = '16px'; t.style.opacity = '1';
+            setTimeout(function() { t.style.top = '-100px'; t.style.opacity = '0'; }, 2000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            var isDark = document.body.classList.contains('dark-mode');
+            var btn = document.getElementById('theme-icon');
+            btn.className = isDark ? 'fas fa-sun text-yellow-400 text-lg' : 'fas fa-moon text-sm';
+        }
+
+        function toggleRevenue() {
+            isRevenueHidden = !isRevenueHidden;
+            var eye = document.getElementById('revenue-eye');
+            eye.className = isRevenueHidden ? 'fas fa-eye-slash text-white opacity-80 text-lg' : 'fas fa-eye text-white opacity-80 text-lg';
+            var amtEl = document.getElementById('dash-amt');
+            if(isRevenueHidden) amtEl.innerText = '₹ •••••';
+            else amtEl.innerText = '₹' + Number(amtEl.dataset.val).toLocaleString('en-IN');
+        }
+
+        // UPDATED NAVIGATE LOGIC TO HANDLE AI HUB
+        function navigate(id) {
+            var secs = document.querySelectorAll('.view-section');
+            for(var i=0; i<secs.length; i++) secs[i].classList.remove('active');
+            document.getElementById(id).classList.add('active');
+            
+            var navs = document.querySelectorAll('.mob-nav');
+            for(var j=0; j<navs.length; j++) {
+                navs[j].classList.remove('text-indigo-600', 'text-red-500', 'text-purple-600'); navs[j].classList.add('text-gray-400');
+                var bg = navs[j].querySelector('.nav-icon-bg'); if(bg) bg.classList.remove('bg-indigo-50', 'bg-red-50', 'bg-purple-50');
+            }
+            var btn = document.getElementById('nav-'+id);
+            if(btn) {
+                var col = 'text-indigo-600';
+                var bgCol = 'bg-indigo-50';
+                if(id === 'defaulters') { col = 'text-red-500'; bgCol = 'bg-red-50'; }
+                if(id === 'aihub') { col = 'text-purple-600'; bgCol = 'bg-purple-50'; }
+                
+                btn.classList.remove('text-gray-400'); btn.classList.add(col);
+                var bg = btn.querySelector('.nav-icon-bg'); if(bg) bg.classList.add(bgCol);
+            }
+            
+            if(id === 'dashboard') { updateDashboard(); renderDefaulters(); }
+            if(id === 'fee') { document.getElementById('feeForm').reset(); document.getElementById('feeDate').valueAsDate = new Date(); initFeeClasses(); document.getElementById('feeStudentId').value = ''; document.getElementById('feeStudentList').classList.add('hidden'); setMode(''); }
+            if(id === 'aihub') { var chat = document.getElementById('ai-chat-history'); chat.scrollTop = chat.scrollHeight; }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function updateDashboard() {
+            document.getElementById('dash-all').innerText = appData.students.length;
+            document.getElementById('dash-paid').innerText = appData.paidCount;
+            
+            var amt = 0;
+            for(var i=0; i<appData.payments.length; i++) {
+                if(appData.payments[i].month === currentMonthName && new Date(appData.payments[i].date).getFullYear() === new Date().getFullYear()) {
+                    amt += Number(appData.payments[i].amount || 0);
+                }
+            }
+            
+            var amtEl = document.getElementById('dash-amt');
+            amtEl.dataset.val = amt;
+            amtEl.innerText = isRevenueHidden ? '₹ •••••' : '₹' + amt.toLocaleString('en-IN');
+            
+            var list = document.getElementById('recent-list'); list.innerHTML = '';
+            if(appData.payments.length === 0) { list.innerHTML = '<div class="glass-panel p-6 rounded-24 text-center"><p class="text-10 font-black text-gray-400 uppercase tracking-widest">NO TRANSACTIONS YET</p></div>'; return; }
+            
+            var recent = appData.payments.slice().reverse().slice(0, 5);
+            for(var k=0; k<recent.length; k++) {
+                var p = recent[k];
+                var pDateRaw = p.date.split('-');
+                var pDateShow = pDateRaw.length === 3 ? pDateRaw[2]+"/"+pDateRaw[1]+"/"+pDateRaw[0] : p.date;
+                
+                list.innerHTML += '<div class="glass-panel p-4 rounded-24 mb-3 flex justify-between items-center"><div class="flex items-center space-x-3"><div onclick="resendSuccess(\'' + p.studentName + '\', \'' + p.phone + '\', \'' + p.amount + '\', \'' + p.month + '\', \'' + (p.mode||'CASH') + '\')" class="w-10 h-10 bg-green-50 text-green-500 rounded-full flex items-center justify-center active:scale-90 shadow-sm"><i class="fab fa-whatsapp text-lg"></i></div><div><p class="font-black text-gray-800 text-xs force-uppercase truncate w-32">' + p.studentName + '</p><p class="text-8 font-bold text-gray-400 mt-0.5 tracking-widest">' + p.className + ' • ' + p.month.toUpperCase() + '</p></div></div><div class="text-right"><p class="font-black text-indigo-600 text-sm">₹' + p.amount + '</p><p class="text-8 font-bold text-gray-400 force-uppercase mt-0.5 tracking-widest">' + (p.mode||'CASH') + ' • ' + pDateShow + '</p></div></div>';
+            }
+        }
+
+        function renderStudents() {
+            var val = document.getElementById('searchInput').value.toLowerCase();
+            var list = document.getElementById('students-list'); list.innerHTML = '';
+            var filtered = [];
+            for(var i=0; i<appData.students.length; i++) {
+                var s = appData.students[i];
+                if((s.name||'').toLowerCase().indexOf(val) !== -1 || (s.phone||'').indexOf(val) !== -1) filtered.push(s);
+            }
+            if(filtered.length === 0) { list.innerHTML = '<div class="glass-panel p-8 rounded-24 text-center"><p class="font-black text-gray-400 text-10 uppercase tracking-widest">NO MATCH FOUND</p></div>'; return; }
+            
+            filtered = filtered.reverse();
+            for(var k=0; k<filtered.length; k++) {
+                var fs = filtered[k];
+                var color = fs.gender === 'Female' ? 'bg-pink-100 text-pink-600' : 'bg-blue-100 text-blue-600';
+                list.innerHTML += '<div class="glass-panel p-5 rounded-32 mb-4"><div class="flex justify-between items-start mb-4"><div class="flex items-center"><div class="w-12 h-12 rounded-2xl ' + color + ' flex items-center justify-center font-black text-xl mr-4">' + fs.name.charAt(0) + '</div><div><h4 class="font-black text-gray-800 text-sm force-uppercase w-[150px] truncate">' + fs.name + '</h4><p class="text-9 font-bold text-gray-400 mt-0.5 tracking-widest">' + fs.id + ' • CLS ' + fs.class + '</p></div></div><button onclick="editStudent(\'' + fs.id + '\')" class="w-10 h-10 rounded-full bg-gray-50 text-gray-400 active:scale-90"><i class="fas fa-pen text-xs"></i></button></div><div class="flex justify-between items-center pt-4 border-t border-gray-100"><div><p class="text-8 font-black text-gray-400 uppercase tracking-widest">MONTHLY FEE</p><p class="font-black text-indigo-600 text-lg -mt-1">₹' + fs.fee + '</p></div><button onclick="window.open(\'https://wa.me/91' + fs.phone + '\', \'_blank\')" class="bg-green-500 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow-lg active:scale-95 flex items-center uppercase tracking-widest"><i class="fab fa-whatsapp text-lg mr-2"></i> CHAT</button></div></div>';
+            }
+        }
+
+        function renderDefaulters() {
+            var list = document.getElementById('defaulters-list'); list.innerHTML = '';
+            var defCount = 0; var today = new Date();
+            
+            for(var i=0; i<appData.students.length; i++) {
+                var s = appData.students[i];
+                var p = s.joinDate.split('/');
+                var joinD = p.length === 3 ? new Date(p[2] + '-' + p[1] + '-' + p[0]) : new Date(s.joinDate);
+                if(isNaN(joinD.getTime())) joinD = new Date();
+                
+                var diffDays = Math.ceil(Math.abs(today - joinD) / (1000 * 60 * 60 * 24)); 
+                var hasPaid = false;
+                for(var j=0; j<appData.payments.length; j++) {
+                    if(appData.payments[j].studentId === s.id && appData.payments[j].month === currentMonthName && new Date(appData.payments[j].date).getFullYear() === today.getFullYear()) hasPaid = true;
+                }
+                
+                if(diffDays > 30 && !hasPaid) {
+                    defCount++;
+                    list.innerHTML += '<div class="glass-panel p-5 rounded-32 border-l-[6px] border-red-500 mb-4 relative overflow-hidden"><div class="absolute -right-4 -bottom-4 w-20 h-20 bg-red-100 rounded-full blur-2xl opacity-50"></div><div class="flex justify-between items-center mb-4 relative z-10"><div><h4 class="font-black text-gray-800 text-sm force-uppercase tracking-wide">' + s.name + '</h4><p class="text-9 font-bold text-gray-500 tracking-widest mt-0.5 force-uppercase">CLASS ' + s.class + ' • DUE: ₹' + s.fee + '</p></div></div><button onclick="sendSoftReminder(\'' + s.name + '\', \'' + s.phone + '\', \'' + s.fee + '\')" class="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-2xl text-10 font-black tracking-widest shadow-lg active:scale-95 uppercase transition-all flex justify-center items-center relative z-10"><i class="fab fa-whatsapp text-sm mr-2"></i> SEND SOFT REMINDER</button></div>';
+                }
+            }
+            
+            document.getElementById('dash-pend').innerText = defCount;
+            if(defCount === 0) list.innerHTML = '<div class="glass-panel p-10 rounded-32 text-center"><div class="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-check-double text-3xl"></i></div><p class="font-black text-gray-400 text-11 uppercase tracking-widest">ALL DUES CLEARED</p></div>';
+        }
+
+        function sendSoftReminder(name, phone, fee) {
+            var msg = 'Greetings! 🌟%0A%0AHope *' + name.toUpperCase() + '* is doing well. This is a gentle reminder regarding the monthly fee of *₹' + fee + '* for *' + currentMonthName.toUpperCase() + '*.%0A%0AKindly process it when convenient.%0A%0AWarm Regards,%0AAB Classes';
+            window.open('https://wa.me/91' + phone + '?text=' + msg, '_blank');
+        }
+
+        function sendSuccessMsg(name, phone, amt, mnth, mode) {
+            var msg = 'Payment Successful! 🎉%0A%0AWe received your payment of *₹' + amt + '* via *' + mode + '* for *' + mnth.toUpperCase() + '* for *' + name.toUpperCase() + '*.%0A%0AThank you! ✨%0A%0A- AB Classes';
+            window.open('https://wa.me/91' + phone + '?text=' + msg, '_blank');
+        }
+        function resendSuccess(name, phone, amt, mnth, mode) { sendSuccessMsg(name, phone, amt, mnth, mode); }
+
+        function toggleSetLock() {
+            setLocked = !setLocked;
+            var t = document.getElementById('set-lock-thumb'); var b = document.getElementById('set-lock-btn'); var l = document.getElementById('set-lock-label');
+            var inputs = document.querySelectorAll('.fee-class, .fee-amount');
+            var dels = document.querySelectorAll('.del-cls-btn');
+            
+            if(setLocked) { 
+                t.style.left = '2px'; b.classList.replace('bg-indigo-500', 'bg-gray-300'); l.innerText = 'LOCKED'; l.classList.replace('text-indigo-600', 'text-gray-400');
+                for(var i=0; i<inputs.length; i++) inputs[i].readOnly = true;
+                for(var d=0; d<dels.length; d++) dels[d].classList.add('hidden');
+            } else { 
+                t.style.left = '22px'; b.classList.replace('bg-gray-300', 'bg-indigo-500'); l.innerText = 'UNLOCKED'; l.classList.replace('text-gray-400', 'text-indigo-600');
+                for(var i=0; i<inputs.length; i++) inputs[i].readOnly = false;
+                for(var d=0; d<dels.length; d++) dels[d].classList.remove('hidden');
+            }
+            document.getElementById('btn-add-cls').disabled = setLocked; document.getElementById('btn-save-set').disabled = setLocked;
+        }
+
+        function initSettingsUI() {
+            var box = document.getElementById('dynamicClassesBox'); box.innerHTML = '';
+            for(var cls in appData.feeSettings) {
+                box.insertAdjacentHTML('beforeend', '<div class="flex space-x-2 class-row"><input type="text" value="' + cls + '" class="fee-class w-1/2 mobile-input bg-gray-50" readonly><input type="number" inputmode="numeric" value="' + appData.feeSettings[cls] + '" class="fee-amount w-1/2 mobile-input text-indigo-600 bg-gray-50" readonly><button type="button" onclick="this.parentElement.remove()" class="del-cls-btn w-12 bg-red-50 text-red-500 rounded-xl hidden shadow-sm"><i class="fas fa-trash"></i></button></div>');
+            }
+            initFeeClasses();
+        }
+        
+        function addNewClassInput() { 
+            var box = document.getElementById('dynamicClassesBox');
+            box.insertAdjacentHTML('beforeend', '<div class="flex space-x-2 class-row"><input type="text" class="fee-class w-1/2 mobile-input bg-gray-50" placeholder="Class Name"><input type="number" inputmode="numeric" class="fee-amount w-1/2 mobile-input text-indigo-600 bg-gray-50" placeholder="Amount"><button type="button" onclick="this.parentElement.remove()" class="del-cls-btn w-12 bg-red-50 text-red-500 rounded-xl shadow-sm"><i class="fas fa-trash"></i></button></div>');
+        }
+        
+        function saveSettings(e) {
+            e.preventDefault();
+            var classes = document.querySelectorAll('.fee-class'), amounts = document.querySelectorAll('.fee-amount'), newFees = {};
+            for(var i=0; i<classes.length; i++) {
+                var trimmedClass = classes[i].value.trim();
+                if(trimmedClass !== '') newFees[trimmedClass] = amounts[i].value;
+            }
+            appData.feeSettings = newFees; 
+            localStorage.setItem('brighttutorialsData', JSON.stringify(appData));
+            initFeeClasses(); showToast('SETTINGS UPDATED'); 
+            if(!setLocked) toggleSetLock();
+            gasApi('saveFeeSettings', newFees);
+        }
+
+        function initFeeClasses() {
+            var opts = '<option value="">-- CHOOSE --</option>';
+            for(var c in appData.feeSettings) opts += '<option value="' + c + '">' + c + '</option>';
+            if(document.getElementById('stuClass')) document.getElementById('stuClass').innerHTML = opts;
+            if(document.getElementById('feeClass')) document.getElementById('feeClass').innerHTML = opts;
+        }
+        function autoFillSetupFee() { document.getElementById('stuFee').value = appData.feeSettings[document.getElementById('stuClass').value] || ''; }
+
+        document.getElementById('stuName').addEventListener('input', function(e) {
+            var name = e.target.value.trim().toLowerCase();
+            if(!name) return;
+            var parts = name.split(' ');
+            var first = parts[0], last = parts.length > 1 ? parts[parts.length-1] : '';
+            var select = document.getElementById('stuGender');
+            
+            var mEnds = ['kumar', 'singh', 'sharma', 'ram', 'raj', 'nath'];
+            var fEnds = ['devi', 'kumari', 'rani', 'kaur', 'bai'];
+            var exceptions = ['aditya','surya','krishna','shiva','guna','arya','rudra','pratap','babu','raja','bhaiya','golu','kunal'];
+            
+            if(fEnds.indexOf(last) !== -1) { select.value = 'Female'; return; }
+            if(mEnds.indexOf(last) !== -1 || exceptions.indexOf(first) !== -1) { select.value = 'Male'; return; }
+            
+            var lc = first.slice(-1);
+            if(lc === 'a' || lc === 'i' || lc === 'y' || first.slice(-2) === 'ee') select.value = 'Female';
+            else select.value = 'Male';
+        });
+
+        function toggleModalLock() { modalLocked = !modalLocked; updateModalLockUI(); }
+        function updateModalLockUI() {
+            var btn = document.getElementById('modalLockBtn');
+            var icon = document.getElementById('modalLockIcon');
+            var saveBtn = document.getElementById('modalSaveBtn');
+            var inputs = document.querySelectorAll('#addForm input, #addForm select');
+            
+            if(modalLocked) {
+                icon.className = 'fas fa-lock text-red-500';
+                btn.classList.add('bg-red-50'); btn.classList.remove('bg-gray-100');
+                saveBtn.classList.add('opacity-30', 'pointer-events-none');
+                for(var i=0; i<inputs.length; i++) { 
+                    if(inputs[i].type !== 'hidden') { inputs[i].readOnly = true; if(inputs[i].tagName === 'SELECT' || inputs[i].type === 'date') inputs[i].disabled = true; }
+                }
+            } else {
+                icon.className = 'fas fa-unlock text-green-500';
+                btn.classList.add('bg-gray-100'); btn.classList.remove('bg-red-50');
+                saveBtn.classList.remove('opacity-30', 'pointer-events-none');
+                for(var j=0; j<inputs.length; j++) { 
+                    inputs[j].readOnly = false; inputs[j].disabled = false;
+                }
+            }
+        }
+
+        function openModal() {
+            document.getElementById('addForm').reset();
+            document.getElementById('stuId').value = ''; document.getElementById('stuRowIndex').value = '';
+            document.getElementById('modalTitle').innerText = 'REGISTRATION'; document.getElementById('stuDate').valueAsDate = new Date();
+            document.getElementById('deleteBox').classList.add('hidden'); delLocked = true; updateDelLockUI();
+            
+            modalLocked = false; document.getElementById('modalLockBtn').classList.add('hidden'); updateModalLockUI();
+            
+            initFeeClasses(); 
+            var modal = document.getElementById('addModal'); var content = document.getElementById('modalContent');
+            modal.classList.remove('hidden'); setTimeout(function() { content.classList.remove('translate-y-full'); }, 10);
+        }
+        function closeModal() { 
+            var content = document.getElementById('modalContent'); content.classList.add('translate-y-full'); 
+            setTimeout(function() { document.getElementById('addModal').classList.add('hidden'); }, 300); 
+        }
+
+        function toggleDelLock() { delLocked = !delLocked; updateDelLockUI(); }
+        function updateDelLockUI() {
+            var btn = document.getElementById('btn-actual-del'); var icon = document.getElementById('del-lock-icon');
+            if(delLocked) { btn.disabled = true; btn.classList.add('opacity-40'); icon.className = 'fas fa-lock text-sm'; document.getElementById('del-lock-btn').classList.replace('text-red-500', 'text-gray-400'); icon.parentElement.classList.replace('border-red-300', 'border-gray-100'); }
+            else { btn.disabled = false; btn.classList.remove('opacity-40'); icon.className = 'fas fa-unlock text-sm'; document.getElementById('del-lock-btn').classList.replace('text-gray-400', 'text-red-500'); icon.parentElement.classList.replace('border-gray-100', 'border-red-300'); }
+        }
+
+        function editStudent(id) {
+            var s = null; for(var i=0; i<appData.students.length; i++) if(appData.students[i].id === id) s = appData.students[i];
+            if(!s) return;
+            openModal(); document.getElementById('modalTitle').innerText = 'EDIT PROFILE';
+            
+            document.getElementById('modalLockBtn').classList.remove('hidden');
+            modalLocked = true; updateModalLockUI();
+
+            document.getElementById('stuId').value = s.id; document.getElementById('stuRowIndex').value = s.rowIndex;
+            document.getElementById('stuName').value = s.name; document.getElementById('stuGender').value = s.gender;
+            document.getElementById('stuClass').value = s.class; document.getElementById('stuPhone').value = s.phone;
+            document.getElementById('stuFee').value = s.fee; 
+            
+            var dParts = s.joinDate.split('/');
+            if(dParts.length === 3) {
+                document.getElementById('stuDate').value = dParts[2] + "-" + dParts[1].padStart(2, '0') + "-" + dParts[0].padStart(2, '0');
+            } else {
+                document.getElementById('stuDate').value = s.joinDate;
+            }
+            document.getElementById('deleteBox').classList.remove('hidden');
+        }
+
+        function confirmDeleteFromModal() {
+            if(confirm("DELETE PROFILE PERMANENTLY?")) {
+                var id = document.getElementById('stuId').value, rowIndex = document.getElementById('stuRowIndex').value;
+                var newList = []; for(var i=0; i<appData.students.length; i++) if(appData.students[i].id !== id) newList.push(appData.students[i]);
+                appData.students = newList; 
+                localStorage.setItem('brighttutorialsData', JSON.stringify(appData));
+                renderStudents(); updateDashboard(); renderDefaulters(); showToast('PROFILE DELETED');
+                closeModal(); 
+                gasApi('deleteStudent', {rowIndex: rowIndex});
+            }
+        }
+
+        function validatePhone(el) { if(el.value.length < 10) { el.classList.add('border-red-300'); } else { el.classList.remove('border-red-300'); } }
+
+        function saveStudentToServer(e) {
+            e.preventDefault();
+            var idVal = document.getElementById('stuId').value; var isEdit = idVal !== '';
+            var lastId = appData.students.length>0 ? parseInt(appData.students[appData.students.length-1].id.split('-')[1], 10) : 0;
+            var newId = isEdit ? idVal : 'STU-' + ("000" + (lastId + 1)).slice(-3);
+            
+            var rawD = document.getElementById('stuDate').value.split('-');
+            var finalDate = rawD.length === 3 ? rawD[2].padStart(2, '0') + "/" + rawD[1].padStart(2, '0') + "/" + rawD[0] : document.getElementById('stuDate').value;
+            
+            var newStu = {
+                id: newId, name: document.getElementById('stuName').value.trim().toUpperCase(), gender: document.getElementById('stuGender').value,
+                class: document.getElementById('stuClass').value, phone: document.getElementById('stuPhone').value,
+                fee: document.getElementById('stuFee').value, joinDate: finalDate,
+                isEdit: isEdit, rowIndex: document.getElementById('stuRowIndex').value
+            };
+            
+            if(isEdit) { for(var k=0; k<appData.students.length; k++) { if(appData.students[k].id === newStu.id) { appData.students[k] = newStu; break; } } } 
+            else { appData.students.push(newStu); }
+            
+            localStorage.setItem('brighttutorialsData', JSON.stringify(appData));
+            renderStudents(); updateDashboard(); renderDefaulters(); closeModal(); showToast('DATA SYNCED');
+            
+            gasApi('saveStudent', newStu).then(r => {
+                if(r && r.status==='success') { appData = r; localStorage.setItem('brighttutorialsData', JSON.stringify(appData)); }
+            });
+        }
+
+        function filterFeeStudents() {
+            var cls = document.getElementById('feeClass').value, val = document.getElementById('feeStudentSearch').value.toLowerCase();
+            var list = document.getElementById('feeStudentList'); list.innerHTML = '';
+            if(!cls && val.length < 1) { list.classList.add('hidden'); return; }
+            
+            var matches = [];
+            for(var i=0; i<appData.students.length; i++) { 
+                var st = appData.students[i]; 
+                if(cls && st.class !== cls) continue;
+                if(st.name.toLowerCase().indexOf(val) !== -1 || st.phone.indexOf(val) !== -1) matches.push(st); 
+            }
+            
+            if(matches.length > 0) {
+                list.classList.remove('hidden');
+                for(var j=0; j<matches.length; j++) {
+                    (function(m) {
+                        var d = document.createElement('div'); d.className = "px-5 py-4 font-black text-11 uppercase border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors flex justify-between";
+                        d.innerHTML = '<span><i class="fas fa-user-circle text-indigo-400 mr-2 text-sm"></i>' + m.name + '</span><span class="text-gray-400 text-9">' + m.class + '</span>';
+                        d.onclick = function() {
+                            document.getElementById('feeClass').value = m.class;
+                            document.getElementById('feeStudentSearch').value = m.name; document.getElementById('feeStudentId').value = m.id;
+                            document.getElementById('feeAmount').value = m.fee; list.classList.add('hidden');
+                        };
+                        list.appendChild(d);
+                    })(matches[j]);
+                }
+            } else { list.classList.add('hidden'); }
+        }
+
+        function populateFeeStudents() { document.getElementById('feeStudentSearch').value = ''; document.getElementById('feeStudentId').value = ''; document.getElementById('feeAmount').value = ''; filterFeeStudents(); }
+        
+        function setMode(m) { 
+            currentMode = m; document.getElementById('feeMode').value = m; 
+            var btns = document.querySelectorAll('.mode-btn');
+            for(var i=0; i<btns.length; i++) { btns[i].classList.remove('bg-indigo-50', 'border-indigo-200', 'text-indigo-600'); btns[i].classList.add('bg-gray-50', 'border-gray-200', 'text-gray-500'); }
+            var act = document.getElementById(m==='CASH' ? 'mode-CASH' : 'mode-UPI');
+            act.classList.remove('bg-gray-50', 'border-gray-200', 'text-gray-500'); act.classList.add('bg-indigo-50', 'border-indigo-200', 'text-indigo-600');
+        }
+
+        function processFee(e) {
+            e.preventDefault();
+            var sid = document.getElementById('feeStudentId').value, st = null;
+            for(var i=0; i<appData.students.length; i++) { if(appData.students[i].id === sid) st = appData.students[i]; }
+            if(!st) { alert("PLEASE SELECT A STUDENT."); return; }
+            if(!currentMode) { alert("PLEASE SELECT PAYMENT MODE (ONLINE / CASH)."); return; }
+            
+            var amt = document.getElementById('feeAmount').value, mnth = document.getElementById('feeMonth').value;
+            var rawD = document.getElementById('feeDate').value.split('-');
+            var dt = rawD[2] + "-" + rawD[1] + "-" + rawD[0];
+            
+            var pay = { id: 'TXN-'+Date.now().toString().slice(-6), studentId: st.id, studentName: st.name, className: st.class, phone: st.phone, amount: amt, month: mnth, date: dt, mode: currentMode };
+            
+            appData.payments.push(pay);
+            if(mnth === currentMonthName && new Date(rawD[0], rawD[1]-1, rawD[2]).getFullYear() === new Date().getFullYear()) {
+                var isPaid = false;
+                for(var j=0; j<appData.payments.length - 1; j++) if(appData.payments[j].studentId === st.id && appData.payments[j].month === currentMonthName) isPaid = true;
+                if(!isPaid) appData.paidCount++;
+            }
+            
+            localStorage.setItem('brighttutorialsData', JSON.stringify(appData));
+            updateDashboard(); renderDefaulters(); showToast('FEE RECORDED'); navigate('dashboard');
+            sendSuccessMsg(st.name, st.phone, amt, mnth, currentMode);
+            
+            gasApi('savePayment', pay);
+        }
+
+        function generateStudentsPDF() {
+            if (!appData.students || appData.students.length === 0) {
+                alert("NO STUDENT DATA AVAILABLE TO GENERATE REPORT!");
+                return;
+            }
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4');
+                
+                doc.setFillColor(99, 102, 241); 
+                doc.rect(0, 0, 210, 40, 'F');
+                
+                doc.setTextColor(255, 255, 255);
+                doc.setFont('Helvetica', 'bold');
+                doc.setFontSize(18);
+                doc.text("BRIGHT TUTORAILS", 14, 18);
+                
+                doc.setFont('Helvetica', 'normal');
+                doc.setFontSize(10);
+                doc.text("STUDENT DIRECTORY REPORT & FEES DATABASE", 14, 25);
+                
+                doc.setFontSize(9);
+                const todayStr = document.getElementById('headerDate').innerText || new Date().toLocaleDateString('en-GB');
+                doc.text(`Generated On: ${todayStr}`, 196, 18, { align: 'right' });
+                doc.text(`Total Strength: ${appData.students.length} Students`, 196, 25, { align: 'right' });
+                
+                const rows = [];
+                const sortedStudents = appData.students.slice().sort((a, b) => (a.class || '').localeCompare(b.class || ''));
+                
+                sortedStudents.forEach((st, idx) => {
+                    rows.push([
+                        idx + 1,
+                        st.id || `STU-${String(idx+1).padStart(3, '0')}`,
+                        (st.name || '').toUpperCase(),
+                        (st.class || '').toUpperCase(),
+                        (st.gender || '').toUpperCase(),
+                        st.phone ? `+91 ${st.phone}` : 'N/A',
+                        `Rs. ${st.fee || '0'}`
+                    ]);
+                });
+                
+                doc.autoTable({
+                    head: [['S.No.', 'Student ID', 'Student Name', 'Class Tiers', 'Gender', 'WhatsApp Mobile', 'Monthly Fee']],
+                    body: rows,
+                    startY: 48,
+                    theme: 'striped',
+                    headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 9, halign: 'left' },
+                    bodyStyles: { fontSize: 9, textColor: [30, 41, 59], font: 'Helvetica' },
+                    columnStyles: { 0: { cellWidth: 12 }, 1: { cellWidth: 22 }, 2: { cellWidth: 50, fontStyle: 'bold' }, 3: { cellWidth: 25 }, 4: { cellWidth: 20 }, 5: { cellWidth: 32 }, 6: { cellWidth: 25, halign: 'right' } },
+                    alternateRowStyles: { fillColor: [248, 250, 252] },
+                    margin: { top: 45, left: 14, right: 14 },
+                    didDrawPage: function (data) {
+                        doc.setFontSize(8);
+                        doc.setTextColor(148, 163, 184);
+                        doc.text("Page " + doc.internal.getNumberOfPages(), 14, doc.internal.pageSize.height - 10);
+                        doc.text("Automated Secure System Database Report", 196, doc.internal.pageSize.height - 10, { align: 'right' });
+                    }
+                });
+                
+                doc.save(`Student_Report_${todayStr.replace(/\//g, '-')}.pdf`);
+                showToast('PDF REPORT DOWNLOADED');
+            } catch (err) {
+                console.error("PDF generation failed:", err);
+                alert("Error generating PDF: " + err.message);
+            }
+        }
+
+        // ==========================================
+        // ADVANCED AI COPILOT FRONTEND LOGIC
+        // ==========================================
+        function simulateAudioInput() {
+            var msg = "Listening...";
+            document.getElementById('ai-input').value = msg;
+            setTimeout(() => {
+                document.getElementById('ai-input').value = "";
+                sendAiCommand("Mark Anurag absent today and rest present in Class 10");
+            }, 2000);
+        }
+
+        async function sendAiCommand(text) {
+            if(!text.trim()) return;
+            document.getElementById('ai-input').value = '';
+            
+            let chat = document.getElementById('ai-chat-history');
+            chat.innerHTML += `<div class="p-3 bg-purple-600 text-white rounded-24 rounded-br-none ml-auto max-w-[85%] mb-4 shadow-md"><p class="text-xs font-bold">${text}</p></div>`;
+            chat.scrollTop = chat.scrollHeight;
+
+            let loaderId = 'loader-' + Date.now();
+            chat.innerHTML += `<div id="${loaderId}" class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-purple-500 max-w-[85%] mb-4 flex items-center space-x-2"><div class="w-2 h-2 bg-purple-500 rounded-full animate-bounce"></div><div class="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div><div class="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div></div>`;
+            chat.scrollTop = chat.scrollHeight;
+
+            let payload = { prompt: text, context: appData };
+            let res = await gasApi('processAiCommand', payload);
+            
+            let loaderEl = document.getElementById(loaderId);
+            if(loaderEl) loaderEl.remove();
+
+            if(res && res.status === 'success') {
+                renderAiResponse(res.result);
+            } else {
+                chat.innerHTML += `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-red-500 max-w-[85%] mb-4"><p class="text-xs font-bold text-red-600">Error processing command. AI backend issue.</p></div>`;
+            }
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function renderAiResponse(res) {
+            let chat = document.getElementById('ai-chat-history');
+            let html = '';
+            
+            if(res.intent === 'DAILY_TODO') {
+                let tasks = (res.tasks || []).map(t => `<li class="flex items-start mb-2"><i class="fas fa-check-circle text-purple-500 mt-0.5 mr-2"></i><span>${t}</span></li>`).join('');
+                html = `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-purple-500 mb-4 shadow-sm"><h4 class="font-black text-sm text-gray-800 dark:text-white mb-3">${res.greeting}</h4><ul class="text-xs font-bold text-gray-600 dark:text-gray-300">${tasks}</ul></div>`;
+            } 
+            else if(res.intent === 'TEST_GENERATION') {
+                html = `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-indigo-500 mb-4 shadow-sm"><h4 class="font-black text-sm text-gray-800 dark:text-white mb-2">Generated Test (${res.totalMarks} Marks)</h4><div class="text-xs text-gray-700 bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700 max-h-40 overflow-y-auto mt-2">${res.html}</div><button onclick="showToast('Test Copied to Clipboard!')" class="mt-3 w-full bg-indigo-50 text-indigo-600 py-2 rounded-xl font-black text-10 uppercase active:scale-95 transition"><i class="fas fa-copy mr-1"></i> Copy HTML</button></div>`;
+            }
+            else if(res.intent === 'REVENUE_PROJECTION') {
+                html = `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-green-500 mb-4 shadow-sm"><h4 class="font-black text-sm text-gray-800 dark:text-white mb-2">Revenue Insights</h4><p class="text-2xl font-black text-green-600 mb-2">₹${res.expected30Days}</p><p class="text-xs font-bold text-gray-600 dark:text-gray-300">${res.insights}</p></div>`;
+            }
+            else if(res.intent === 'ATTENDANCE_BATCH') {
+                html = `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-blue-500 mb-4 shadow-sm"><h4 class="font-black text-sm text-gray-800 dark:text-white mb-2">Attendance Marked</h4><p class="text-xs font-bold text-gray-600 dark:text-gray-300">Processed records successfully.</p></div>`;
+            }
+            else if(res.intent === 'CLASS_SUMMARY_ABSENTEES') {
+                 html = `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-yellow-500 mb-4 shadow-sm"><h4 class="font-black text-sm text-gray-800 dark:text-white mb-2">Summary Broadcast Ready</h4><p class="text-xs font-bold text-gray-600 dark:text-gray-300 mb-3">AI generated note for absentees.</p><button onclick="window.open('https://wa.me/?text=${encodeURIComponent(res.whatsappMessage)}')" class="w-full bg-green-500 text-white py-3 rounded-xl font-black text-10 uppercase active:scale-95 transition shadow-md"><i class="fab fa-whatsapp text-sm mr-1"></i> Send to Absentees</button></div>`;
+            }
+            else {
+                let text = res.message || res.replyMessage || res.suggestionText || res.reasoning || JSON.stringify(res);
+                html = `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-purple-500 mb-4 shadow-sm"><p class="text-xs font-bold text-gray-700 dark:text-gray-200">${text}</p></div>`;
+            }
+            
+            chat.innerHTML += html;
+            chat.scrollTop = chat.scrollHeight;
+        }
+    </script>
+</body>
+</html>
