@@ -71,12 +71,10 @@
         
         .drag-handle { width: 45px; height: 5px; background: #cbd5e1; border-radius: 5px; margin: 0 auto 20px auto; }
         
-        /* Attendance Toggle Custom Styles */
         .att-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
         .att-btn[data-selected="Present"] { background-color: #d1fae5 !important; color: #059669 !important; border-color: #34d399 !important; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2); }
         .att-btn[data-selected="Absent"] { background-color: #fee2e2 !important; color: #dc2626 !important; border-color: #f87171 !important; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2); }
 
-        /* Dark Mode Overrides */
         body.dark-mode { background-color: #0f172a; color: #f1f5f9; }
         body.dark-mode .glass-panel { background: rgba(30, 41, 59, 0.95); border-color: #334155; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5); }
         body.dark-mode .glass-nav { background: #1e293b; border-color: #334155; }
@@ -141,10 +139,10 @@
                     </div>
                     <div>
                         <p class="text-xs font-black tracking-wide uppercase">WhatsApp Autopilot</p>
-                        <p class="text-[9px] text-purple-300 uppercase tracking-widest font-bold mt-0.5">Silent Background Dispatch</p>
+                        <p class="text-[9px] text-purple-300 uppercase tracking-widest font-bold mt-0.5">100% Silent Background Mode</p>
                     </div>
                 </div>
-                <button onclick="toggleAutopilot()" id="autopilotBtn" class="bg-green-500 text-white font-black px-3 py-1.5 rounded-xl text-9 uppercase tracking-wider shadow-md transition-all">ENABLED</button>
+                <div class="bg-green-500 text-white font-black px-3 py-1.5 rounded-xl text-9 uppercase tracking-wider shadow-md">ACTIVE</div>
             </div>
 
             <div class="bg-white p-4 rounded-24 shadow-sm border border-gray-100 mb-5 relative overflow-hidden">
@@ -502,7 +500,7 @@
         var modalLocked = false; 
         var isRevenueHidden = true;
 
-        // FIXED API CALL ENGINE: Ensures proper JSON stringification and text/plain headers to avoid CORS blocking Google Sheets from saving data.
+        // FIXED API CALL ENGINE (No CORS blocks anymore)
         async function gasApi(action, payload = null) {
             try {
                 let options = { method: "GET" };
@@ -527,7 +525,6 @@
             const cachedData = localStorage.getItem('vsehData');
             if(cachedData) {
                 appData = JSON.parse(cachedData);
-                if(appData.autopilotEnabled === undefined) appData.autopilotEnabled = true;
                 document.getElementById('globalLoader').style.display = 'none';
                 syncUIPanels();
             }
@@ -551,7 +548,6 @@
             renderStudents(); 
             renderDefaulters();
             runAiBriefingModels();
-            updateAutopilotUI();
         }
 
         function updateClock() {
@@ -568,57 +564,24 @@
             setTimeout(function() { t.style.top = '-100px'; t.style.opacity = '0'; }, 2500);
         }
 
-        // ==========================================
-        // WHATSAPP AUTOPILOT ENGINE (STEALTH)
-        // ==========================================
-        function toggleAutopilot() {
-            appData.autopilotEnabled = !appData.autopilotEnabled;
-            localStorage.setItem('vsehData', JSON.stringify(appData));
-            updateAutopilotUI();
-            showToast(appData.autopilotEnabled ? "AUTOPILOT ON: SILENT DISPATCH" : "AUTOPILOT OFF: REDIRECT MODE");
-        }
-
-        function updateAutopilotUI() {
-            var btn = document.getElementById('autopilotBtn');
-            if(appData.autopilotEnabled) {
-                btn.className = "bg-green-500 text-white font-black px-3 py-1.5 rounded-xl text-9 uppercase tracking-wider shadow-md transition-all";
-                btn.innerText = "ENABLED";
-            } else {
-                btn.className = "bg-gray-400 text-white font-black px-3 py-1.5 rounded-xl text-9 uppercase tracking-wider shadow-md transition-all";
-                btn.innerText = "DISABLED";
-            }
-        }
-
-        function dispatchNotification(phone, messageText) {
-            if(appData.autopilotEnabled) {
-                // Background Silent Send via Backend Webhook API
-                gasApi('stealthWhatsAppTrigger', { phone: phone, message: messageText });
-                showToast("SILENT MSG DISPATCHED VIA AUTOPILOT");
-            } else {
-                // Legacy Fallback (Redirect to WhatsApp App)
-                window.open('https://wa.me/91' + phone + '?text=' + encodeURIComponent(messageText), '_blank');
-            }
+        function sendSuccessMsg(name, phone, amt, mnth, mode) {
+            var msg = `Payment Successful! 🎉 We received your payment of *₹${amt}* via *${mode}* for *${mnth.toUpperCase()}* for *${name.toUpperCase()}*. Thank you! ✨ - VSEH`;
+            // DIRECT BACKGROUND CALL (No Window.open)
+            gasApi('stealthWhatsAppTrigger', { phone: phone, message: msg });
+            showToast("SILENT RECEIPT DISPATCHED");
         }
 
         function sendSoftReminder(name, phone, fee) {
             var msg = `Greetings! 🌟 Hope *${name.toUpperCase()}* is doing well. This is a gentle reminder regarding the monthly fee of *₹${fee}* for *${currentMonthName.toUpperCase()}*. Kindly process it when convenient. Warm Regards, VSEH`;
-            dispatchNotification(phone, msg);
+            // DIRECT BACKGROUND CALL
+            gasApi('stealthWhatsAppTrigger', { phone: phone, message: msg });
+            showToast("SILENT REMINDER DISPATCHED");
         }
 
-        function sendSuccessMsg(name, phone, amt, mnth, mode) {
-            var msg = `Payment Successful! 🎉 We received your payment of *₹${amt}* via *${mode}* for *${mnth.toUpperCase()}* for *${name.toUpperCase()}*. Thank you! ✨ - VSEH`;
-            dispatchNotification(phone, msg);
-        }
-        function resendSuccess(name, phone, amt, mnth, mode) { sendSuccessMsg(name, phone, amt, mnth, mode); }
-
-        // ==========================================
-        // AI BRIEFING & DASHBOARD
-        // ==========================================
         function runAiBriefingModels() {
             var activeStudents = appData.students.length;
             var paidStudents = appData.paidCount;
             var unpaidCount = activeStudents - paidStudents;
-            
             var briefText = `Good Morning! System stable. Today you have ${unpaidCount} target students for fee clearance. Revenue flows are running at optimal capacity.`;
             var briefEl = document.getElementById('aiBriefingText');
             if(briefEl) briefEl.innerText = briefText;
@@ -692,13 +655,10 @@
                 var pDateRaw = p.date.split('-');
                 var pDateShow = pDateRaw.length === 3 ? pDateRaw[2]+"/"+pDateRaw[1]+"/"+pDateRaw[0] : p.date;
                 
-                list.innerHTML += `<div class="glass-panel p-4 rounded-24 mb-3 flex justify-between items-center"><div class="flex items-center space-x-3"><div onclick="resendSuccess('${p.studentName}', '${p.phone}', '${p.amount}', '${p.month}', '${p.mode||'CASH'}')" class="w-10 h-10 bg-green-50 text-green-500 rounded-full flex items-center justify-center active:scale-90 shadow-sm"><i class="fab fa-whatsapp text-lg"></i></div><div><p class="font-black text-gray-800 text-xs force-uppercase truncate w-32">${p.studentName}</p><p class="text-8 font-bold text-gray-400 mt-0.5 tracking-widest">${p.className} • ${p.month.toUpperCase()}</p></div></div><div class="text-right"><p class="font-black text-indigo-600 text-sm">₹${p.amount}</p><p class="text-8 font-bold text-gray-400 force-uppercase mt-0.5 tracking-widest">${p.mode||'CASH'} • ${pDateShow}</p></div></div>`;
+                list.innerHTML += `<div class="glass-panel p-4 rounded-24 mb-3 flex justify-between items-center"><div><p class="font-black text-gray-800 text-xs force-uppercase truncate w-32">${p.studentName}</p><p class="text-8 font-bold text-gray-400 mt-0.5 tracking-widest">${p.className} • ${p.month.toUpperCase()}</p></div><div class="text-right"><p class="font-black text-indigo-600 text-sm">₹${p.amount}</p><p class="text-8 font-bold text-gray-400 force-uppercase mt-0.5 tracking-widest">${p.mode||'CASH'} • ${pDateShow}</p></div></div>`;
             }
         }
 
-        // ==========================================
-        // ATTENDANCE LOGIC
-        // ==========================================
         function loadAttendanceStudents() {
             var cls = document.getElementById('attClass').value;
             var list = document.getElementById('attendance-list');
@@ -764,7 +724,7 @@
                         setAttStatus(aBtn, 'Absent');
                     } else {
                         if(!pBtn.hasAttribute('data-selected') && !aBtn.hasAttribute('data-selected')) {
-                            setAttStatus(pBtn, 'Present'); // Default others to present
+                            setAttStatus(pBtn, 'Present');
                         }
                     }
                 });
@@ -805,10 +765,9 @@
                     status: status
                 });
 
-                // AUTOPILOT ABSENT ALERT
                 if(status === 'Absent') {
                     var alertText = `Dear Parent, your ward ${studentName.toUpperCase()} was marked ABSENT today (${formatDt}) in class. Kindly check. - VSEH Hub`;
-                    dispatchNotification(studentPhone, alertText);
+                    gasApi('stealthWhatsAppTrigger', { phone: studentPhone, message: alertText });
                 }
             }
 
@@ -833,7 +792,7 @@
             for(var k=0; k<filtered.length; k++) {
                 var fs = filtered[k];
                 var color = fs.gender === 'Female' ? 'bg-pink-100 text-pink-600' : 'bg-blue-100 text-blue-600';
-                list.innerHTML += `<div class="glass-panel p-5 rounded-32 mb-4"><div class="flex justify-between items-start mb-4"><div class="flex items-center"><div class="w-12 h-12 rounded-2xl ${color} flex items-center justify-center font-black text-xl mr-4">${fs.name.charAt(0)}</div><div><h4 class="font-black text-gray-800 text-sm force-uppercase w-[150px] truncate">${fs.name}</h4><p class="text-9 font-bold text-gray-400 mt-0.5 tracking-widest">${fs.id} • CLS ${fs.class}</p></div></div><button onclick="editStudent('${fs.id}')" class="w-10 h-10 rounded-full bg-gray-50 text-gray-400 active:scale-90"><i class="fas fa-pen text-xs"></i></button></div><div class="flex justify-between items-center pt-4 border-t border-gray-100"><div><p class="text-8 font-black text-gray-400 uppercase tracking-widest">MONTHLY FEE</p><p class="font-black text-indigo-600 text-lg -mt-1">₹${fs.fee}</p></div><button onclick="dispatchNotification('${fs.phone}', 'Hello from VSEH System Hub')" class="bg-green-500 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow-lg active:scale-95 flex items-center uppercase tracking-widest"><i class="fab fa-whatsapp text-lg mr-2"></i> CHAT</button></div></div>`;
+                list.innerHTML += `<div class="glass-panel p-5 rounded-32 mb-4"><div class="flex justify-between items-start mb-4"><div class="flex items-center"><div class="w-12 h-12 rounded-2xl ${color} flex items-center justify-center font-black text-xl mr-4">${fs.name.charAt(0)}</div><div><h4 class="font-black text-gray-800 text-sm force-uppercase w-[150px] truncate">${fs.name}</h4><p class="text-9 font-bold text-gray-400 mt-0.5 tracking-widest">${fs.id} • CLS ${fs.class}</p></div></div><button onclick="editStudent('${fs.id}')" class="w-10 h-10 rounded-full bg-gray-50 text-gray-400 active:scale-90"><i class="fas fa-pen text-xs"></i></button></div><div class="flex justify-between items-center pt-4 border-t border-gray-100"><div><p class="text-8 font-black text-gray-400 uppercase tracking-widest">MONTHLY FEE</p><p class="font-black text-indigo-600 text-lg -mt-1">₹${fs.fee}</p></div><button onclick="window.open('https://wa.me/91${fs.phone}', '_blank')" class="bg-green-500 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow-lg active:scale-95 flex items-center uppercase tracking-widest"><i class="fab fa-whatsapp text-lg mr-2"></i> CHAT</button></div></div>`;
             }
         }
 
@@ -855,7 +814,7 @@
                 
                 if(diffDays > 30 && !hasPaid) {
                     defCount++;
-                    list.innerHTML += `<div class="glass-panel p-5 rounded-32 border-l-[6px] border-red-500 mb-4 relative overflow-hidden"><div class="absolute -right-4 -bottom-4 w-20 h-20 bg-red-100 rounded-full blur-2xl opacity-50"></div><div class="flex justify-between items-center mb-4 relative z-10"><div><h4 class="font-black text-gray-800 text-sm force-uppercase tracking-wide">${s.name}</h4><p class="text-9 font-bold text-gray-500 tracking-widest mt-0.5 force-uppercase">CLASS ${s.class} • DUE: ₹${s.fee}</p></div></div><button onclick="sendSoftReminder('${s.name}', '${s.phone}', '${s.fee}')" class="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-2xl text-10 font-black tracking-widest shadow-lg active:scale-95 uppercase transition-all flex justify-center items-center relative z-10"><i class="fab fa-whatsapp text-sm mr-2"></i> SEND SOFT REMINDER</button></div>`;
+                    list.innerHTML += `<div class="glass-panel p-5 rounded-32 border-l-[6px] border-red-500 mb-4 relative overflow-hidden"><div class="absolute -right-4 -bottom-4 w-20 h-20 bg-red-100 rounded-full blur-2xl opacity-50"></div><div class="flex justify-between items-center mb-4 relative z-10"><div><h4 class="font-black text-gray-800 text-sm force-uppercase tracking-wide">${s.name}</h4><p class="text-9 font-bold text-gray-500 tracking-widest mt-0.5 force-uppercase">CLASS ${s.class} • DUE: ₹${s.fee}</p></div></div><button onclick="sendSoftReminder('${s.name}', '${s.phone}', '${s.fee}')" class="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-2xl text-10 font-black tracking-widest shadow-lg active:scale-95 uppercase transition-all flex justify-center items-center relative z-10"><i class="fab fa-whatsapp text-sm mr-2"></i> SEND SILENT REMINDER</button></div>`;
                 }
             }
             
@@ -1120,7 +1079,6 @@
             localStorage.setItem('vsehData', JSON.stringify(appData));
             updateDashboard(); renderDefaulters(); showToast('FEE RECORDED'); navigate('dashboard');
             
-            // SILENT AUTO DISPATCH RECEIPT CALLED HERE
             sendSuccessMsg(st.name, st.phone, amt, mnth, currentMode);
             
             gasApi('savePayment', pay);
@@ -1194,9 +1152,6 @@
             }
         }
 
-        // ==========================================
-        // ADVANCED AI COPILOT FRONTEND LOGIC 
-        // ==========================================
         function simulateAudioInput() {
             var msg = "Listening...";
             document.getElementById('ai-input').value = msg;
