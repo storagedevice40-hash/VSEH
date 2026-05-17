@@ -489,7 +489,9 @@
     </div>
 
     <script>
-        // NOTE: Agar tumne backend script change karke "New Deployment" kiya hai, toh bas naya URL yahan replace kar dena!
+        // ==========================================
+        // YAHAN APNA NAYA WEB APP URL DAALO
+        // ==========================================
         const API_URL = 'https://script.google.com/macros/s/AKfycbyzdhgBbbfyCBbHVN8nTr8NgBhrRi5dxhv8WdM8s0Q2SUbtEkZ3pG6gZ0Zt7MRaLrsO/exec';
 
         var appData = { students: [], payments: [], attendance: [], feeSettings: {}, paidCount: 0, autopilotEnabled: true };
@@ -500,11 +502,18 @@
         var modalLocked = false; 
         var isRevenueHidden = true;
 
+        // FIXED API CALL ENGINE: Ensures proper JSON stringification and text/plain headers to avoid CORS blocking Google Sheets from saving data.
         async function gasApi(action, payload = null) {
             try {
-                let url = API_URL + "?action=" + action;
                 let options = { method: "GET" };
-                if (payload) options = { method: "POST", body: JSON.stringify({ action: action, data: payload }) };
+                if (payload) {
+                    options = {
+                        method: "POST",
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                        body: JSON.stringify({ action: action, data: payload })
+                    };
+                }
+                let url = API_URL + "?action=" + action;
                 const response = await fetch(url, options);
                 return await response.json();
             } catch(e) { console.error("API Error:", e); return null; }
@@ -550,6 +559,13 @@
             var d = ("0" + now.getDate()).slice(-2), m = ("0" + (now.getMonth() + 1)).slice(-2), y = now.getFullYear();
             document.getElementById('headerDate').innerText = d + "/" + m + "/" + y;
             document.getElementById('headerTime').innerText = now.toLocaleTimeString('en-GB', { hour12: true });
+        }
+
+        function showToast(msg) {
+            var t = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            t.style.top = '16px'; t.style.opacity = '1';
+            setTimeout(function() { t.style.top = '-100px'; t.style.opacity = '0'; }, 2500);
         }
 
         // ==========================================
@@ -868,7 +884,7 @@
         function initSettingsUI() {
             var box = document.getElementById('dynamicClassesBox'); box.innerHTML = '';
             for(var cls in appData.feeSettings) {
-                box.insertAdjacentHTML('beforeend', '<div class="flex space-x-2 class-row"><input type="text" value="' + cls + '" class="fee-class w-1/2 mobile-input bg-gray-50" readonly><input type="number" inputmode="numeric" value="' + appData.feeSettings[cls] + '" class="fee-amount w-1/2 mobile-input text-indigo-600 bg-gray-50" readonly><button type="button" onclick="this.parentElement.remove()" class="del-cls-btn w-12 bg-red-50 text-red-500 rounded-xl hidden shadow-sm"><i class="fas fa-trash"></i></button></div>');
+                box.insertAdjacentHTML('beforeend', `<div class="flex space-x-2 class-row"><input type="text" value="${cls}" class="fee-class w-1/2 mobile-input bg-gray-50" readonly><input type="number" inputmode="numeric" value="${appData.feeSettings[cls]}" class="fee-amount w-1/2 mobile-input text-indigo-600 bg-gray-50" readonly><button type="button" onclick="this.parentElement.remove()" class="del-cls-btn w-12 bg-red-50 text-red-500 rounded-xl hidden shadow-sm"><i class="fas fa-trash"></i></button></div>`);
             }
             initFeeClasses();
         }
@@ -944,7 +960,6 @@
             }
         }
 
-        // CLOSE AND OPEN MODALS
         function openModal() {
             document.getElementById('addForm').reset();
             document.getElementById('stuId').value = ''; document.getElementById('stuRowIndex').value = '';
