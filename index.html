@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VSEH PRO - AI COPILOT</title>
+    <title>VSEH PRO - AI AUTOPILOT</title>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -103,13 +103,13 @@
 
     <div id="toast" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[100] transition-all duration-300 opacity-0 pointer-events-none w-11/12" style="max-width: 400px;">
         <div class="bg-gray-900 text-white px-5 py-3.5 rounded-full shadow-2xl flex items-center justify-center text-xs font-black uppercase tracking-widest border border-gray-700">
-            <i class="fas fa-check-circle text-green-400 mr-2 text-lg"></i> <span id="toastMsg">Synced Successfully</span>
+            <i class="fas fa-check-circle text-green-400 mr-2 text-lg"></i> <span id="toastMsg">Action Executed</span>
         </div>
     </div>
 
     <div id="globalLoader" class="fixed inset-0 bg-[#f4f7fe] dark-target z-[999] flex flex-col items-center justify-center p-6 text-center">
         <div class="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-5"></div>
-        <p class="text-indigo-600 font-black tracking-widest text-sm animate-pulse uppercase">INITIALIZING SYSTEM...</p>
+        <p class="text-indigo-600 font-black tracking-widest text-sm animate-pulse uppercase">INITIALIZING AI SYSTEM...</p>
         <div id="errorBox" class="hidden w-full bg-red-50 border-2 border-red-200 p-5 rounded-2xl mt-6 shadow-xl"></div>
     </div>
 
@@ -211,7 +211,6 @@
                     <h2 class="text-2xl font-black text-gray-800 tracking-tight">Attendance</h2>
                     <p class="text-10 font-black text-gray-400 uppercase tracking-widest mt-1">Mark Daily Status</p>
                 </div>
-                <!-- AI VOICE ATTENDANCE BUTTON -->
                 <button onclick="triggerVoiceAttendance()" class="bg-purple-600 text-white px-3 py-2.5 rounded-xl text-xs font-black shadow-lg active:scale-95 transition flex items-center uppercase tracking-wider">
                     <i class="fas fa-microphone mr-2 animate-pulse"></i> AI Audio
                 </button>
@@ -260,7 +259,6 @@
                 <button onclick="sendAiCommand('Draft a polite reply to a parent asking for fee extension.')" class="ai-chip text-9 bg-pink-50 text-pink-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-pink-200 snap-center"><i class="fas fa-comments mr-2"></i> Parent Reply</button>
                 <button onclick="sendAiCommand('Analyze revenue projection for the next 30 days based on payments.')" class="ai-chip text-9 bg-green-50 text-green-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-green-200 snap-center"><i class="fas fa-chart-line mr-2"></i> Rev Forecast</button>
                 <button onclick="sendAiCommand('Provide a syllabus pace alert. Are we lagging?')" class="ai-chip text-9 bg-red-50 text-red-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-red-200 snap-center"><i class="fas fa-triangle-exclamation mr-2"></i> Syllabus Alert</button>
-                <button onclick="sendAiCommand('Create a festival greeting message for all students.')" class="ai-chip text-9 bg-yellow-50 text-yellow-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-yellow-200 snap-center"><i class="fas fa-gift mr-2"></i> Greetings</button>
             </div>
 
             <div id="ai-chat-history" class="space-y-4 mb-20 overflow-y-auto" style="height: 48vh;">
@@ -431,7 +429,7 @@
         </button>
     </nav>
 
-    <!-- STUDENT MODAL (UPDATED WITH AI PTM NOTE) -->
+    <!-- STUDENT MODAL WITH AI PTM NOTE -->
     <div id="addModal" class="fixed inset-0 bg-gray-900 bg-opacity-60 z-50 hidden flex flex-col justify-end transition-opacity duration-300">
         <div class="absolute inset-0" onclick="closeModal()"></div>
         <div class="bg-white w-full max-w-500 mx-auto rounded-t-32 px-5 pt-3 pb-8 transform transition-transform translate-y-full h-[90vh] overflow-y-auto relative premium-shadow" id="modalContent">
@@ -445,7 +443,6 @@
                 </div>
             </div>
 
-            <!-- AI PTM CARD (VISIBLE ONLY IN EDIT MODE) -->
             <div id="aiStudentSummaryCard" class="hidden bg-purple-50 border border-purple-100 rounded-2xl p-3 mb-4">
                 <p class="text-[8px] font-black text-purple-600 uppercase tracking-widest"><i class="fas fa-brain"></i> AI Micro-Metric Insight Vector</p>
                 <p id="aiStudentSummaryText" class="text-10 font-bold text-purple-950 mt-1 uppercase leading-snug"></p>
@@ -502,6 +499,7 @@
     </div>
 
     <script>
+        // YAHAN API URL HAI - AGAR NYA DEPLOYMENT KIYA HAI TOH ISE BADAL LENA!
         const API_URL = 'https://script.google.com/macros/s/AKfycbyzdhgBbbfyCBbHVN8nTr8NgBhrRi5dxhv8WdM8s0Q2SUbtEkZ3pG6gZ0Zt7MRaLrsO/exec';
 
         var appData = { students: [], payments: [], attendance: [], feeSettings: {}, paidCount: 0, autopilotEnabled: true };
@@ -572,7 +570,7 @@
         }
 
         // ==========================================
-        // WHATSAPP AUTOPILOT ENGINE
+        // WHATSAPP AUTOPILOT ENGINE (STEALTH)
         // ==========================================
         function toggleAutopilot() {
             appData.autopilotEnabled = !appData.autopilotEnabled;
@@ -594,14 +592,26 @@
 
         function dispatchNotification(phone, messageText) {
             if(appData.autopilotEnabled) {
-                // Background Silent Send (Triggering Backend)
+                // Background Silent Send (Triggering Backend APIs)
                 gasApi('stealthWhatsAppTrigger', { phone: phone, message: messageText });
                 showToast("SILENT MSG DISPATCHED VIA AUTOPILOT");
             } else {
-                // Legacy Fallback (Redirect to WhatsApp)
+                // Legacy Fallback (Redirect to WhatsApp App)
                 window.open('https://wa.me/91' + phone + '?text=' + encodeURIComponent(messageText), '_blank');
             }
         }
+
+        // HELPER FUNCTIONS FOR WHATSAPP
+        function sendSoftReminder(name, phone, fee) {
+            var msg = `Greetings! 🌟 Hope *${name.toUpperCase()}* is doing well. This is a gentle reminder regarding the monthly fee of *₹${fee}* for *${currentMonthName.toUpperCase()}*. Kindly process it when convenient. Warm Regards, VSEH`;
+            dispatchNotification(phone, msg);
+        }
+
+        function sendSuccessMsg(name, phone, amt, mnth, mode) {
+            var msg = `Payment Successful! 🎉 We received your payment of *₹${amt}* via *${mode}* for *${mnth.toUpperCase()}* for *${name.toUpperCase()}*. Thank you! ✨ - VSEH`;
+            dispatchNotification(phone, msg);
+        }
+        function resendSuccess(name, phone, amt, mnth, mode) { sendSuccessMsg(name, phone, amt, mnth, mode); }
 
         // ==========================================
         // AI BRIEFING & DASHBOARD
@@ -855,17 +865,6 @@
             if(defCount === 0) list.innerHTML = '<div class="glass-panel p-10 rounded-32 text-center"><div class="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-check-double text-3xl"></i></div><p class="font-black text-gray-400 text-11 uppercase tracking-widest">ALL DUES CLEARED</p></div>';
         }
 
-        function sendSoftReminder(name, phone, fee) {
-            var msg = `Greetings! 🌟 Hope *${name.toUpperCase()}* is doing well. This is a gentle reminder regarding the monthly fee of *₹${fee}* for *${currentMonthName.toUpperCase()}*. Kindly process it when convenient. Warm Regards, VSEH`;
-            dispatchNotification(phone, msg);
-        }
-
-        function sendSuccessMsg(name, phone, amt, mnth, mode) {
-            var msg = `Payment Successful! 🎉 We received your payment of *₹${amt}* via *${mode}* for *${mnth.toUpperCase()}* for *${name.toUpperCase()}*. Thank you! ✨ - VSEH`;
-            dispatchNotification(phone, msg);
-        }
-        function resendSuccess(name, phone, amt, mnth, mode) { sendSuccessMsg(name, phone, amt, mnth, mode); }
-
         function toggleSetLock() {
             setLocked = !setLocked;
             var t = document.getElementById('set-lock-thumb'); var b = document.getElementById('set-lock-btn'); var l = document.getElementById('set-lock-label');
@@ -887,7 +886,7 @@
         function initSettingsUI() {
             var box = document.getElementById('dynamicClassesBox'); box.innerHTML = '';
             for(var cls in appData.feeSettings) {
-                box.insertAdjacentHTML('beforeend', '<div class="flex space-x-2 class-row"><input type="text" value="' + cls + '" class="fee-class w-1/2 mobile-input bg-gray-50" readonly><input type="number" inputmode="numeric" value="' + appData.feeSettings[cls] + '" class="fee-amount w-1/2 mobile-input text-indigo-600 bg-gray-50" readonly><button type="button" onclick="this.parentElement.remove()" class="del-cls-btn w-12 bg-red-50 text-red-500 rounded-xl hidden shadow-sm"><i class="fas fa-trash"></i></button></div>');
+                box.insertAdjacentHTML('beforeend', `<div class="flex space-x-2 class-row"><input type="text" value="${cls}" class="fee-class w-1/2 mobile-input bg-gray-50" readonly><input type="number" inputmode="numeric" value="${appData.feeSettings[cls]}" class="fee-amount w-1/2 mobile-input text-indigo-600 bg-gray-50" readonly><button type="button" onclick="this.parentElement.remove()" class="del-cls-btn w-12 bg-red-50 text-red-500 rounded-xl hidden shadow-sm"><i class="fas fa-trash"></i></button></div>`);
             }
             initFeeClasses();
         }
@@ -913,7 +912,7 @@
 
         function initFeeClasses() {
             var opts = '<option value="">-- CHOOSE --</option>';
-            for(var c in appData.feeSettings) opts += '<option value="' + c + '">' + c + '</option>';
+            for(var c in appData.feeSettings) opts += `<option value="${c}">${c}</option>`;
             if(document.getElementById('stuClass')) document.getElementById('stuClass').innerHTML = opts;
             if(document.getElementById('feeClass')) document.getElementById('feeClass').innerHTML = opts;
             if(document.getElementById('attClass')) document.getElementById('attClass').innerHTML = opts;
@@ -969,7 +968,7 @@
             document.getElementById('modalTitle').innerText = 'REGISTRATION'; document.getElementById('stuDate').valueAsDate = new Date();
             document.getElementById('deleteBox').classList.add('hidden'); delLocked = true; updateDelLockUI();
             
-            document.getElementById('aiStudentSummaryCard').classList.add('hidden'); // Hide AI Note generator on add new
+            document.getElementById('aiStudentSummaryCard').classList.add('hidden'); 
             
             modalLocked = false; document.getElementById('modalLockBtn').classList.add('hidden'); updateModalLockUI();
             
@@ -1080,7 +1079,7 @@
                 for(var j=0; j<matches.length; j++) {
                     (function(m) {
                         var d = document.createElement('div'); d.className = "px-5 py-4 font-black text-11 uppercase border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors flex justify-between";
-                        d.innerHTML = '<span><i class="fas fa-user-circle text-indigo-400 mr-2 text-sm"></i>' + m.name + '</span><span class="text-gray-400 text-9">' + m.class + '</span>';
+                        d.innerHTML = `<span><i class="fas fa-user-circle text-indigo-400 mr-2 text-sm"></i>${m.name}</span><span class="text-gray-400 text-9">${m.class}</span>`;
                         d.onclick = function() {
                             document.getElementById('feeClass').value = m.class;
                             document.getElementById('feeStudentSearch').value = m.name; document.getElementById('feeStudentId').value = m.id;
@@ -1125,9 +1124,8 @@
             localStorage.setItem('vsehData', JSON.stringify(appData));
             updateDashboard(); renderDefaulters(); showToast('FEE RECORDED'); navigate('dashboard');
             
-            // AUTOPILOT NOTIFICATION FOR FEE SUCCESS
-            var successMessage = `Payment Successful! 🎉 We received your payment of *₹${amt}* via *${currentMode}* for *${mnth.toUpperCase()}* for *${st.name.toUpperCase()}*. Thank you! ✨ - VSEH`;
-            dispatchNotification(st.phone, successMessage);
+            // SILENT DISPATCH FEE MESSAGE
+            sendSuccessMsg(st.name, st.phone, amt, mnth, currentMode);
             
             gasApi('savePayment', pay);
         }
