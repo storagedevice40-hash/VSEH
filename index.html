@@ -132,10 +132,8 @@
     </header>
 
     <main class="flex-1 overflow-y-auto px-4 w-full">
-        <!-- DASHBOARD TAB -->
         <section id="dashboard" class="view-section active">
             
-            <!-- AI AUTOPILOT TOGGLE -->
             <div class="ai-glow-card rounded-24 p-4 text-white mb-5 flex justify-between items-center shadow-lg">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-purple-500 bg-opacity-20 flex items-center justify-center border border-purple-400">
@@ -149,7 +147,6 @@
                 <button onclick="toggleAutopilot()" id="autopilotBtn" class="bg-green-500 text-white font-black px-3 py-1.5 rounded-xl text-9 uppercase tracking-wider shadow-md transition-all">ENABLED</button>
             </div>
 
-            <!-- AI MORNING BRIEFING -->
             <div class="bg-white p-4 rounded-24 shadow-sm border border-gray-100 mb-5 relative overflow-hidden">
                 <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-purple-600"></div>
                 <div class="ml-2">
@@ -204,7 +201,6 @@
             <div id="recent-list" class="space-y-3"></div>
         </section>
 
-        <!-- ATTENDANCE TAB -->
         <section id="attendance" class="view-section">
             <div class="flex justify-between items-end mb-6 px-1">
                 <div>
@@ -243,7 +239,6 @@
             </button>
         </section>
 
-        <!-- AI HUB TAB -->
         <section id="aihub" class="view-section relative">
             <div class="flex justify-between items-end mb-4 px-1">
                 <div>
@@ -276,7 +271,6 @@
             </div>
         </section>
 
-        <!-- STUDENTS TAB -->
         <section id="students" class="view-section">
             <div class="flex justify-between items-end mb-6 px-1">
                 <div>
@@ -299,7 +293,6 @@
             <div id="students-list" class="space-y-4"></div>
         </section>
 
-        <!-- DEFAULTERS TAB -->
         <section id="defaulters" class="view-section">
             <div class="flex justify-between items-end mb-6 px-1">
                 <div>
@@ -311,7 +304,6 @@
             <div id="defaulters-list" class="space-y-4"></div>
         </section>
 
-        <!-- FEE COLLECTION TAB -->
         <section id="fee" class="view-section">
             <div class="text-center mb-8 pt-4">
                 <div class="w-20 h-20 mx-auto bg-green-100 rounded-32 flex items-center justify-center mb-4 transform rotate-3 shadow-sm">
@@ -364,14 +356,13 @@
                         </div>
                     </div>
                     
-                    <button type="submit" class="w-full bg-green-500 text-white py-4 rounded-xl font-black text-sm mt-6 shadow-lg active:scale-95 transition uppercase tracking-widest flex items-center justify-center">
-                        SAVE & WHATSAPP <i class="fab fa-whatsapp ml-2 text-lg"></i>
+                    <button type="submit" class="w-full bg-green-600 text-white py-4 rounded-xl font-black text-sm mt-6 shadow-lg active:scale-95 transition uppercase tracking-widest flex items-center justify-center">
+                        SAVE & AUTO DISPATCH <i class="fas fa-robot ml-2 text-lg"></i>
                     </button>
                 </form>
             </div>
         </section>
 
-        <!-- SETTINGS TAB -->
         <section id="settings" class="view-section">
             <div class="flex justify-between items-center mb-6 px-1">
                 <div>
@@ -429,7 +420,6 @@
         </button>
     </nav>
 
-    <!-- STUDENT MODAL WITH AI PTM NOTE -->
     <div id="addModal" class="fixed inset-0 bg-gray-900 bg-opacity-60 z-50 hidden flex flex-col justify-end transition-opacity duration-300">
         <div class="absolute inset-0" onclick="closeModal()"></div>
         <div class="bg-white w-full max-w-500 mx-auto rounded-t-32 px-5 pt-3 pb-8 transform transition-transform translate-y-full h-[90vh] overflow-y-auto relative premium-shadow" id="modalContent">
@@ -499,7 +489,7 @@
     </div>
 
     <script>
-        // YAHAN API URL HAI - AGAR NYA DEPLOYMENT KIYA HAI TOH ISE BADAL LENA!
+        // NOTE: Agar tumne backend script change karke "New Deployment" kiya hai, toh bas naya URL yahan replace kar dena!
         const API_URL = 'https://script.google.com/macros/s/AKfycbyzdhgBbbfyCBbHVN8nTr8NgBhrRi5dxhv8WdM8s0Q2SUbtEkZ3pG6gZ0Zt7MRaLrsO/exec';
 
         var appData = { students: [], payments: [], attendance: [], feeSettings: {}, paidCount: 0, autopilotEnabled: true };
@@ -562,13 +552,6 @@
             document.getElementById('headerTime').innerText = now.toLocaleTimeString('en-GB', { hour12: true });
         }
 
-        function showToast(msg) {
-            var t = document.getElementById('toast');
-            document.getElementById('toastMsg').innerText = msg;
-            t.style.top = '16px'; t.style.opacity = '1';
-            setTimeout(function() { t.style.top = '-100px'; t.style.opacity = '0'; }, 2500);
-        }
-
         // ==========================================
         // WHATSAPP AUTOPILOT ENGINE (STEALTH)
         // ==========================================
@@ -592,7 +575,7 @@
 
         function dispatchNotification(phone, messageText) {
             if(appData.autopilotEnabled) {
-                // Background Silent Send (Triggering Backend APIs)
+                // Background Silent Send via Backend Webhook API
                 gasApi('stealthWhatsAppTrigger', { phone: phone, message: messageText });
                 showToast("SILENT MSG DISPATCHED VIA AUTOPILOT");
             } else {
@@ -601,7 +584,6 @@
             }
         }
 
-        // HELPER FUNCTIONS FOR WHATSAPP
         function sendSoftReminder(name, phone, fee) {
             var msg = `Greetings! 🌟 Hope *${name.toUpperCase()}* is doing well. This is a gentle reminder regarding the monthly fee of *₹${fee}* for *${currentMonthName.toUpperCase()}*. Kindly process it when convenient. Warm Regards, VSEH`;
             dispatchNotification(phone, msg);
@@ -886,7 +868,7 @@
         function initSettingsUI() {
             var box = document.getElementById('dynamicClassesBox'); box.innerHTML = '';
             for(var cls in appData.feeSettings) {
-                box.insertAdjacentHTML('beforeend', `<div class="flex space-x-2 class-row"><input type="text" value="${cls}" class="fee-class w-1/2 mobile-input bg-gray-50" readonly><input type="number" inputmode="numeric" value="${appData.feeSettings[cls]}" class="fee-amount w-1/2 mobile-input text-indigo-600 bg-gray-50" readonly><button type="button" onclick="this.parentElement.remove()" class="del-cls-btn w-12 bg-red-50 text-red-500 rounded-xl hidden shadow-sm"><i class="fas fa-trash"></i></button></div>`);
+                box.insertAdjacentHTML('beforeend', '<div class="flex space-x-2 class-row"><input type="text" value="' + cls + '" class="fee-class w-1/2 mobile-input bg-gray-50" readonly><input type="number" inputmode="numeric" value="' + appData.feeSettings[cls] + '" class="fee-amount w-1/2 mobile-input text-indigo-600 bg-gray-50" readonly><button type="button" onclick="this.parentElement.remove()" class="del-cls-btn w-12 bg-red-50 text-red-500 rounded-xl hidden shadow-sm"><i class="fas fa-trash"></i></button></div>');
             }
             initFeeClasses();
         }
@@ -962,6 +944,7 @@
             }
         }
 
+        // CLOSE AND OPEN MODALS
         function openModal() {
             document.getElementById('addForm').reset();
             document.getElementById('stuId').value = ''; document.getElementById('stuRowIndex').value = '';
@@ -969,7 +952,6 @@
             document.getElementById('deleteBox').classList.add('hidden'); delLocked = true; updateDelLockUI();
             
             document.getElementById('aiStudentSummaryCard').classList.add('hidden'); 
-            
             modalLocked = false; document.getElementById('modalLockBtn').classList.add('hidden'); updateModalLockUI();
             
             initFeeClasses(); 
@@ -996,7 +978,6 @@
             document.getElementById('modalLockBtn').classList.remove('hidden');
             modalLocked = true; updateModalLockUI();
 
-            // Populate AI Data Summary Profile
             var aiBox = document.getElementById('aiStudentSummaryCard');
             var aiText = document.getElementById('aiStudentSummaryText');
             aiBox.classList.remove('hidden');
@@ -1124,7 +1105,7 @@
             localStorage.setItem('vsehData', JSON.stringify(appData));
             updateDashboard(); renderDefaulters(); showToast('FEE RECORDED'); navigate('dashboard');
             
-            // SILENT DISPATCH FEE MESSAGE
+            // SILENT AUTO DISPATCH RECEIPT CALLED HERE
             sendSuccessMsg(st.name, st.phone, amt, mnth, currentMode);
             
             gasApi('savePayment', pay);
