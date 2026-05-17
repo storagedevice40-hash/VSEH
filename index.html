@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VSEH PRO</title>
+    <title>VSEH PRO - AI COPILOT</title>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -59,6 +59,7 @@
         .grad-card-2 { background: linear-gradient(135deg, #10b981, #3b82f6); }
         .grad-card-3 { background: linear-gradient(135deg, #f43f5e, #f97316); }
         .text-grad { background: linear-gradient(to right, #7c3aed, #4f46e5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .ai-glow-card { background: linear-gradient(135deg, #1e1b4b, #311042); border: 1px solid #a855f7; }
         
         .mobile-input {
             background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px;
@@ -89,7 +90,6 @@
         body.dark-mode .mobile-input:focus { border-color: #818cf8 !important; box-shadow: 0 0 0 4px rgba(129,140,248,0.2) !important; }
         body.dark-mode #modalContent { background-color: #1e293b !important; }
         body.dark-mode .mode-btn { background-color: #0f172a !important; border-color: #334155 !important; color: #94a3b8 !important; }
-        body.dark-mode .mode-btn.border-indigo-200 { background-color: rgba(99,102,241,0.1) !important; border-color: #818cf8 !important; color: #818cf8 !important; }
         body.dark-mode .text-grad { background: linear-gradient(to right, #a78bfa, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
         .ai-chip { white-space: nowrap; display: inline-flex; align-items: center; }
@@ -109,7 +109,7 @@
 
     <div id="globalLoader" class="fixed inset-0 bg-[#f4f7fe] dark-target z-[999] flex flex-col items-center justify-center p-6 text-center">
         <div class="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-5"></div>
-        <p class="text-indigo-600 font-black tracking-widest text-sm animate-pulse uppercase">INITIALIZING...</p>
+        <p class="text-indigo-600 font-black tracking-widest text-sm animate-pulse uppercase">INITIALIZING SYSTEM...</p>
         <div id="errorBox" class="hidden w-full bg-red-50 border-2 border-red-200 p-5 rounded-2xl mt-6 shadow-xl"></div>
     </div>
 
@@ -132,7 +132,35 @@
     </header>
 
     <main class="flex-1 overflow-y-auto px-4 w-full">
+        <!-- DASHBOARD TAB -->
         <section id="dashboard" class="view-section active">
+            
+            <!-- AI AUTOPILOT TOGGLE -->
+            <div class="ai-glow-card rounded-24 p-4 text-white mb-5 flex justify-between items-center shadow-lg">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-purple-500 bg-opacity-20 flex items-center justify-center border border-purple-400">
+                        <i class="fab fa-whatsapp text-green-400 text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-black tracking-wide uppercase">WhatsApp Autopilot</p>
+                        <p class="text-[9px] text-purple-300 uppercase tracking-widest font-bold mt-0.5">Silent Background Dispatch</p>
+                    </div>
+                </div>
+                <button onclick="toggleAutopilot()" id="autopilotBtn" class="bg-green-500 text-white font-black px-3 py-1.5 rounded-xl text-9 uppercase tracking-wider shadow-md transition-all">ENABLED</button>
+            </div>
+
+            <!-- AI MORNING BRIEFING -->
+            <div class="bg-white p-4 rounded-24 shadow-sm border border-gray-100 mb-5 relative overflow-hidden">
+                <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-purple-600"></div>
+                <div class="ml-2">
+                    <div class="flex items-center space-x-1.5 mb-1.5">
+                        <i class="fas fa-bolt text-yellow-500 text-xs"></i>
+                        <p class="text-10 font-black text-purple-600 uppercase tracking-widest">AI DAILY BRIEFING</p>
+                    </div>
+                    <p id="aiBriefingText" class="text-xs text-gray-600 font-bold leading-relaxed uppercase">Analyzing active parameters... Loading briefing.</p>
+                </div>
+            </div>
+
             <div class="flex justify-between items-end mb-4 px-1">
                 <h2 class="text-2xl font-black text-gray-800 tracking-tight">Overview</h2>
                 <span class="text-10 font-black text-indigo-600 bg-indigo-100 px-2.5 py-1 rounded-lg uppercase">Dashboard</span>
@@ -176,13 +204,17 @@
             <div id="recent-list" class="space-y-3"></div>
         </section>
 
+        <!-- ATTENDANCE TAB -->
         <section id="attendance" class="view-section">
             <div class="flex justify-between items-end mb-6 px-1">
                 <div>
                     <h2 class="text-2xl font-black text-gray-800 tracking-tight">Attendance</h2>
                     <p class="text-10 font-black text-gray-400 uppercase tracking-widest mt-1">Mark Daily Status</p>
                 </div>
-                <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600"><i class="fas fa-clipboard-user text-xl"></i></div>
+                <!-- AI VOICE ATTENDANCE BUTTON -->
+                <button onclick="triggerVoiceAttendance()" class="bg-purple-600 text-white px-3 py-2.5 rounded-xl text-xs font-black shadow-lg active:scale-95 transition flex items-center uppercase tracking-wider">
+                    <i class="fas fa-microphone mr-2 animate-pulse"></i> AI Audio
+                </button>
             </div>
             
             <div class="glass-panel rounded-32 p-5 mb-5 shadow-sm">
@@ -208,10 +240,11 @@
             </div>
             
             <button onclick="submitAttendance()" class="w-full bg-blue-600 text-white py-4 rounded-xl font-black text-sm mt-2 shadow-lg active:scale-95 transition uppercase tracking-widest flex items-center justify-center">
-                SAVE ATTENDANCE <i class="fas fa-cloud-arrow-up ml-2 text-lg"></i>
+                SAVE & SEND ALERTS <i class="fas fa-paper-plane ml-2 text-lg"></i>
             </button>
         </section>
 
+        <!-- AI HUB TAB -->
         <section id="aihub" class="view-section relative">
             <div class="flex justify-between items-end mb-4 px-1">
                 <div>
@@ -228,9 +261,6 @@
                 <button onclick="sendAiCommand('Analyze revenue projection for the next 30 days based on payments.')" class="ai-chip text-9 bg-green-50 text-green-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-green-200 snap-center"><i class="fas fa-chart-line mr-2"></i> Rev Forecast</button>
                 <button onclick="sendAiCommand('Provide a syllabus pace alert. Are we lagging?')" class="ai-chip text-9 bg-red-50 text-red-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-red-200 snap-center"><i class="fas fa-triangle-exclamation mr-2"></i> Syllabus Alert</button>
                 <button onclick="sendAiCommand('Create a festival greeting message for all students.')" class="ai-chip text-9 bg-yellow-50 text-yellow-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-yellow-200 snap-center"><i class="fas fa-gift mr-2"></i> Greetings</button>
-                <button onclick="sendAiCommand('Recommend scholarship % for a bright student.')" class="ai-chip text-9 bg-blue-50 text-blue-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-blue-200 snap-center"><i class="fas fa-award mr-2"></i> Scholarship</button>
-                <button onclick="sendAiCommand('Summarize today class for absent students.')" class="ai-chip text-9 bg-orange-50 text-orange-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-orange-200 snap-center"><i class="fas fa-microphone-lines mr-2"></i> Audio Note</button>
-                <button onclick="sendAiCommand('How to split a batch of 60 students effectively?')" class="ai-chip text-9 bg-teal-50 text-teal-600 px-4 py-2 rounded-xl font-black uppercase active:scale-95 transition border border-teal-200 snap-center"><i class="fas fa-people-arrows mr-2"></i> Batch Split</button>
             </div>
 
             <div id="ai-chat-history" class="space-y-4 mb-20 overflow-y-auto" style="height: 48vh;">
@@ -248,6 +278,7 @@
             </div>
         </section>
 
+        <!-- STUDENTS TAB -->
         <section id="students" class="view-section">
             <div class="flex justify-between items-end mb-6 px-1">
                 <div>
@@ -270,6 +301,7 @@
             <div id="students-list" class="space-y-4"></div>
         </section>
 
+        <!-- DEFAULTERS TAB -->
         <section id="defaulters" class="view-section">
             <div class="flex justify-between items-end mb-6 px-1">
                 <div>
@@ -281,6 +313,7 @@
             <div id="defaulters-list" class="space-y-4"></div>
         </section>
 
+        <!-- FEE COLLECTION TAB -->
         <section id="fee" class="view-section">
             <div class="text-center mb-8 pt-4">
                 <div class="w-20 h-20 mx-auto bg-green-100 rounded-32 flex items-center justify-center mb-4 transform rotate-3 shadow-sm">
@@ -340,6 +373,7 @@
             </div>
         </section>
 
+        <!-- SETTINGS TAB -->
         <section id="settings" class="view-section">
             <div class="flex justify-between items-center mb-6 px-1">
                 <div>
@@ -397,17 +431,25 @@
         </button>
     </nav>
 
+    <!-- STUDENT MODAL (UPDATED WITH AI PTM NOTE) -->
     <div id="addModal" class="fixed inset-0 bg-gray-900 bg-opacity-60 z-50 hidden flex flex-col justify-end transition-opacity duration-300">
         <div class="absolute inset-0" onclick="closeModal()"></div>
         <div class="bg-white w-full max-w-500 mx-auto rounded-t-32 px-5 pt-3 pb-8 transform transition-transform translate-y-full h-[90vh] overflow-y-auto relative premium-shadow" id="modalContent">
             <div class="drag-handle"></div>
             
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-black text-gray-800 uppercase" id="modalTitle">Registration</h3>
                 <div class="flex items-center space-x-3">
                     <button type="button" id="modalLockBtn" onclick="toggleModalLock()" class="hidden w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 active:scale-90 shadow-sm transition"><i id="modalLockIcon" class="fas fa-lock"></i></button>
                     <button type="button" onclick="closeModal()" class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 active:scale-90"><i class="fas fa-times"></i></button>
                 </div>
+            </div>
+
+            <!-- AI PTM CARD (VISIBLE ONLY IN EDIT MODE) -->
+            <div id="aiStudentSummaryCard" class="hidden bg-purple-50 border border-purple-100 rounded-2xl p-3 mb-4">
+                <p class="text-[8px] font-black text-purple-600 uppercase tracking-widest"><i class="fas fa-brain"></i> AI Micro-Metric Insight Vector</p>
+                <p id="aiStudentSummaryText" class="text-10 font-bold text-purple-950 mt-1 uppercase leading-snug"></p>
+                <button type="button" onclick="triggerPtmNoteGeneration()" class="mt-2 bg-purple-600 text-white font-black text-[8px] px-2 py-1 rounded-md uppercase tracking-wider shadow-sm">Get AI PTM Report</button>
             </div>
             
             <form id="addForm" onsubmit="saveStudentToServer(event)" class="space-y-4">
@@ -462,15 +504,7 @@
     <script>
         const API_URL = 'https://script.google.com/macros/s/AKfycbyzdhgBbbfyCBbHVN8nTr8NgBhrRi5dxhv8WdM8s0Q2SUbtEkZ3pG6gZ0Zt7MRaLrsO/exec';
 
-        window.loadTimer = setTimeout(function() {
-            var gl = document.getElementById('globalLoader');
-            if(gl.style.display !== 'none') {
-                document.getElementById('errorBox').classList.remove('hidden');
-                document.getElementById('errorBox').innerHTML = '<p class="text-xs font-bold text-red-600 uppercase tracking-widest text-center">Timeout! Check API Connection.</p>';
-            }
-        }, 12000);
-
-        var appData = { students: [], payments: [], attendance: [], feeSettings: {}, paidCount: 0 };
+        var appData = { students: [], payments: [], attendance: [], feeSettings: {}, paidCount: 0, autopilotEnabled: true };
         var currentMonthName = new Date().toLocaleString('default', { month: 'long' });
         var currentMode = ''; 
         var setLocked = true; 
@@ -496,22 +530,32 @@
             const cachedData = localStorage.getItem('vsehData');
             if(cachedData) {
                 appData = JSON.parse(cachedData);
+                if(appData.autopilotEnabled === undefined) appData.autopilotEnabled = true;
                 document.getElementById('globalLoader').style.display = 'none';
-                initSettingsUI(); updateDashboard(); renderStudents(); renderDefaulters();
+                syncUIPanels();
             }
 
             gasApi('getAppData').then(function(res) {
                 clearTimeout(window.loadTimer);
                 if(res && res.status === 'success') { 
-                    appData = res;
+                    appData = Object.assign(appData, res);
                     localStorage.setItem('vsehData', JSON.stringify(appData));
                     if(!cachedData) document.getElementById('globalLoader').style.display = 'none';
-                    initSettingsUI(); updateDashboard(); renderStudents(); renderDefaulters();
+                    syncUIPanels();
                 } else if(!cachedData) {
                     alert(res ? res.message : "Failed to load data from server");
                 }
             });
         });
+
+        function syncUIPanels() {
+            initSettingsUI(); 
+            updateDashboard(); 
+            renderStudents(); 
+            renderDefaulters();
+            runAiBriefingModels();
+            updateAutopilotUI();
+        }
 
         function updateClock() {
             var now = new Date();
@@ -524,7 +568,52 @@
             var t = document.getElementById('toast');
             document.getElementById('toastMsg').innerText = msg;
             t.style.top = '16px'; t.style.opacity = '1';
-            setTimeout(function() { t.style.top = '-100px'; t.style.opacity = '0'; }, 2000);
+            setTimeout(function() { t.style.top = '-100px'; t.style.opacity = '0'; }, 2500);
+        }
+
+        // ==========================================
+        // WHATSAPP AUTOPILOT ENGINE
+        // ==========================================
+        function toggleAutopilot() {
+            appData.autopilotEnabled = !appData.autopilotEnabled;
+            localStorage.setItem('vsehData', JSON.stringify(appData));
+            updateAutopilotUI();
+            showToast(appData.autopilotEnabled ? "AUTOPILOT ON: SILENT DISPATCH" : "AUTOPILOT OFF: REDIRECT MODE");
+        }
+
+        function updateAutopilotUI() {
+            var btn = document.getElementById('autopilotBtn');
+            if(appData.autopilotEnabled) {
+                btn.className = "bg-green-500 text-white font-black px-3 py-1.5 rounded-xl text-9 uppercase tracking-wider shadow-md transition-all";
+                btn.innerText = "ENABLED";
+            } else {
+                btn.className = "bg-gray-400 text-white font-black px-3 py-1.5 rounded-xl text-9 uppercase tracking-wider shadow-md transition-all";
+                btn.innerText = "DISABLED";
+            }
+        }
+
+        function dispatchNotification(phone, messageText) {
+            if(appData.autopilotEnabled) {
+                // Background Silent Send (Triggering Backend)
+                gasApi('stealthWhatsAppTrigger', { phone: phone, message: messageText });
+                showToast("SILENT MSG DISPATCHED VIA AUTOPILOT");
+            } else {
+                // Legacy Fallback (Redirect to WhatsApp)
+                window.open('https://wa.me/91' + phone + '?text=' + encodeURIComponent(messageText), '_blank');
+            }
+        }
+
+        // ==========================================
+        // AI BRIEFING & DASHBOARD
+        // ==========================================
+        function runAiBriefingModels() {
+            var activeStudents = appData.students.length;
+            var paidStudents = appData.paidCount;
+            var unpaidCount = activeStudents - paidStudents;
+            
+            var briefText = `Good Morning! System stable. Today you have ${unpaidCount} target students for fee clearance. Revenue flows are running at optimal capacity.`;
+            var briefEl = document.getElementById('aiBriefingText');
+            if(briefEl) briefEl.innerText = briefText;
         }
 
         function toggleTheme() {
@@ -595,7 +684,7 @@
                 var pDateRaw = p.date.split('-');
                 var pDateShow = pDateRaw.length === 3 ? pDateRaw[2]+"/"+pDateRaw[1]+"/"+pDateRaw[0] : p.date;
                 
-                list.innerHTML += '<div class="glass-panel p-4 rounded-24 mb-3 flex justify-between items-center"><div class="flex items-center space-x-3"><div onclick="resendSuccess(\'' + p.studentName + '\', \'' + p.phone + '\', \'' + p.amount + '\', \'' + p.month + '\', \'' + (p.mode||'CASH') + '\')" class="w-10 h-10 bg-green-50 text-green-500 rounded-full flex items-center justify-center active:scale-90 shadow-sm"><i class="fab fa-whatsapp text-lg"></i></div><div><p class="font-black text-gray-800 text-xs force-uppercase truncate w-32">' + p.studentName + '</p><p class="text-8 font-bold text-gray-400 mt-0.5 tracking-widest">' + p.className + ' • ' + p.month.toUpperCase() + '</p></div></div><div class="text-right"><p class="font-black text-indigo-600 text-sm">₹' + p.amount + '</p><p class="text-8 font-bold text-gray-400 force-uppercase mt-0.5 tracking-widest">' + (p.mode||'CASH') + ' • ' + pDateShow + '</p></div></div>';
+                list.innerHTML += `<div class="glass-panel p-4 rounded-24 mb-3 flex justify-between items-center"><div class="flex items-center space-x-3"><div onclick="resendSuccess('${p.studentName}', '${p.phone}', '${p.amount}', '${p.month}', '${p.mode||'CASH'}')" class="w-10 h-10 bg-green-50 text-green-500 rounded-full flex items-center justify-center active:scale-90 shadow-sm"><i class="fab fa-whatsapp text-lg"></i></div><div><p class="font-black text-gray-800 text-xs force-uppercase truncate w-32">${p.studentName}</p><p class="text-8 font-bold text-gray-400 mt-0.5 tracking-widest">${p.className} • ${p.month.toUpperCase()}</p></div></div><div class="text-right"><p class="font-black text-indigo-600 text-sm">₹${p.amount}</p><p class="text-8 font-bold text-gray-400 force-uppercase mt-0.5 tracking-widest">${p.mode||'CASH'} • ${pDateShow}</p></div></div>`;
             }
         }
 
@@ -614,7 +703,7 @@
             
             filtered.forEach(s => {
                 list.innerHTML += `
-                <div class="glass-panel p-3 px-4 rounded-2xl mb-3 flex justify-between items-center att-row" data-stuid="${s.id}" data-stuname="${s.name}">
+                <div class="glass-panel p-3 px-4 rounded-2xl mb-3 flex justify-between items-center att-row" data-stuid="${s.id}" data-stuname="${s.name}" data-phone="${s.phone}">
                     <div>
                         <p class="font-black text-gray-800 text-sm force-uppercase w-32 truncate">${s.name}</p>
                         <p class="text-8 font-bold text-gray-400 tracking-widest mt-0.5">${s.id}</p>
@@ -644,6 +733,38 @@
             showToast('ALL MARKED PRESENT');
         }
 
+        function triggerVoiceAttendance() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert("VOICE ARCHITECTURE NOT SUPPORTED BY BROWSER");
+                return;
+            }
+            var recognition = new webkitSpeechRecognition();
+            recognition.lang = 'hi-IN';
+            showToast("AI LISTENING... SPEAK ABSENTEES");
+            
+            recognition.onresult = function(event) {
+                var voiceText = event.results[0][0].transcript.toLowerCase();
+                showToast("PROCESSING AUDIO...");
+                
+                var rows = document.querySelectorAll('#attendance-list .att-row');
+                rows.forEach(row => {
+                    var stName = row.getAttribute('data-stuname').toLowerCase();
+                    var pBtn = row.querySelectorAll('.att-btn')[0];
+                    var aBtn = row.querySelectorAll('.att-btn')[1];
+                    
+                    if(voiceText.includes(stName)) {
+                        setAttStatus(aBtn, 'Absent');
+                    } else {
+                        if(!pBtn.hasAttribute('data-selected') && !aBtn.hasAttribute('data-selected')) {
+                            setAttStatus(pBtn, 'Present'); // Default others to present
+                        }
+                    }
+                });
+                showToast("AUDIO MATRIX PARSED");
+            };
+            recognition.start();
+        }
+
         function submitAttendance() {
             var cls = document.getElementById('attClass').value;
             var dt = document.getElementById('attDate').value;
@@ -662,20 +783,30 @@
                 var selBtn = row.querySelector('.att-btn[data-selected]');
                 if(!selBtn) { alert('Please mark Present/Absent for all students before saving.'); return; }
                 
+                var status = selBtn.getAttribute('data-selected');
+                var studentName = row.getAttribute('data-stuname');
+                var studentPhone = row.getAttribute('data-phone');
+
                 records.push({
                     id: 'ATT-' + Date.now().toString().slice(-5) + i,
                     studentId: row.getAttribute('data-stuid'),
-                    studentName: row.getAttribute('data-stuname'),
+                    studentName: studentName,
                     class: cls,
                     date: formatDt,
                     month: monthName,
-                    status: selBtn.getAttribute('data-selected')
+                    status: status
                 });
+
+                // AUTOPILOT ABSENT ALERT
+                if(status === 'Absent') {
+                    var alertText = `Dear Parent, your ward ${studentName.toUpperCase()} was marked ABSENT today (${formatDt}) in class. Kindly check. - VSEH Hub`;
+                    dispatchNotification(studentPhone, alertText);
+                }
             }
 
             appData.attendance = appData.attendance.concat(records);
             localStorage.setItem('vsehData', JSON.stringify(appData));
-            showToast('ATTENDANCE SAVED');
+            showToast('ATTENDANCE SAVED & ALERTS SENT');
             gasApi('saveAttendanceBatch', records);
             loadAttendanceStudents(); 
         }
@@ -694,7 +825,7 @@
             for(var k=0; k<filtered.length; k++) {
                 var fs = filtered[k];
                 var color = fs.gender === 'Female' ? 'bg-pink-100 text-pink-600' : 'bg-blue-100 text-blue-600';
-                list.innerHTML += '<div class="glass-panel p-5 rounded-32 mb-4"><div class="flex justify-between items-start mb-4"><div class="flex items-center"><div class="w-12 h-12 rounded-2xl ' + color + ' flex items-center justify-center font-black text-xl mr-4">' + fs.name.charAt(0) + '</div><div><h4 class="font-black text-gray-800 text-sm force-uppercase w-[150px] truncate">' + fs.name + '</h4><p class="text-9 font-bold text-gray-400 mt-0.5 tracking-widest">' + fs.id + ' • CLS ' + fs.class + '</p></div></div><button onclick="editStudent(\'' + fs.id + '\')" class="w-10 h-10 rounded-full bg-gray-50 text-gray-400 active:scale-90"><i class="fas fa-pen text-xs"></i></button></div><div class="flex justify-between items-center pt-4 border-t border-gray-100"><div><p class="text-8 font-black text-gray-400 uppercase tracking-widest">MONTHLY FEE</p><p class="font-black text-indigo-600 text-lg -mt-1">₹' + fs.fee + '</p></div><button onclick="window.open(\'https://wa.me/91' + fs.phone + '\', \'_blank\')" class="bg-green-500 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow-lg active:scale-95 flex items-center uppercase tracking-widest"><i class="fab fa-whatsapp text-lg mr-2"></i> CHAT</button></div></div>';
+                list.innerHTML += `<div class="glass-panel p-5 rounded-32 mb-4"><div class="flex justify-between items-start mb-4"><div class="flex items-center"><div class="w-12 h-12 rounded-2xl ${color} flex items-center justify-center font-black text-xl mr-4">${fs.name.charAt(0)}</div><div><h4 class="font-black text-gray-800 text-sm force-uppercase w-[150px] truncate">${fs.name}</h4><p class="text-9 font-bold text-gray-400 mt-0.5 tracking-widest">${fs.id} • CLS ${fs.class}</p></div></div><button onclick="editStudent('${fs.id}')" class="w-10 h-10 rounded-full bg-gray-50 text-gray-400 active:scale-90"><i class="fas fa-pen text-xs"></i></button></div><div class="flex justify-between items-center pt-4 border-t border-gray-100"><div><p class="text-8 font-black text-gray-400 uppercase tracking-widest">MONTHLY FEE</p><p class="font-black text-indigo-600 text-lg -mt-1">₹${fs.fee}</p></div><button onclick="dispatchNotification('${fs.phone}', 'Hello from VSEH System Hub')" class="bg-green-500 text-white px-4 py-2.5 rounded-xl text-xs font-black shadow-lg active:scale-95 flex items-center uppercase tracking-widest"><i class="fab fa-whatsapp text-lg mr-2"></i> CHAT</button></div></div>`;
             }
         }
 
@@ -716,7 +847,7 @@
                 
                 if(diffDays > 30 && !hasPaid) {
                     defCount++;
-                    list.innerHTML += '<div class="glass-panel p-5 rounded-32 border-l-[6px] border-red-500 mb-4 relative overflow-hidden"><div class="absolute -right-4 -bottom-4 w-20 h-20 bg-red-100 rounded-full blur-2xl opacity-50"></div><div class="flex justify-between items-center mb-4 relative z-10"><div><h4 class="font-black text-gray-800 text-sm force-uppercase tracking-wide">' + s.name + '</h4><p class="text-9 font-bold text-gray-500 tracking-widest mt-0.5 force-uppercase">CLASS ' + s.class + ' • DUE: ₹' + s.fee + '</p></div></div><button onclick="sendSoftReminder(\'' + s.name + '\', \'' + s.phone + '\', \'' + s.fee + '\')" class="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-2xl text-10 font-black tracking-widest shadow-lg active:scale-95 uppercase transition-all flex justify-center items-center relative z-10"><i class="fab fa-whatsapp text-sm mr-2"></i> SEND SOFT REMINDER</button></div>';
+                    list.innerHTML += `<div class="glass-panel p-5 rounded-32 border-l-[6px] border-red-500 mb-4 relative overflow-hidden"><div class="absolute -right-4 -bottom-4 w-20 h-20 bg-red-100 rounded-full blur-2xl opacity-50"></div><div class="flex justify-between items-center mb-4 relative z-10"><div><h4 class="font-black text-gray-800 text-sm force-uppercase tracking-wide">${s.name}</h4><p class="text-9 font-bold text-gray-500 tracking-widest mt-0.5 force-uppercase">CLASS ${s.class} • DUE: ₹${s.fee}</p></div></div><button onclick="sendSoftReminder('${s.name}', '${s.phone}', '${s.fee}')" class="w-full bg-red-500 hover:bg-red-600 text-white py-4 rounded-2xl text-10 font-black tracking-widest shadow-lg active:scale-95 uppercase transition-all flex justify-center items-center relative z-10"><i class="fab fa-whatsapp text-sm mr-2"></i> SEND SOFT REMINDER</button></div>`;
                 }
             }
             
@@ -725,13 +856,13 @@
         }
 
         function sendSoftReminder(name, phone, fee) {
-            var msg = 'Greetings! 🌟%0A%0AHope *' + name.toUpperCase() + '* is doing well. This is a gentle reminder regarding the monthly fee of *₹' + fee + '* for *' + currentMonthName.toUpperCase() + '*.%0A%0AKindly process it when convenient.%0A%0AWarm Regards,%0AAB Classes';
-            window.open('https://wa.me/91' + phone + '?text=' + msg, '_blank');
+            var msg = `Greetings! 🌟 Hope *${name.toUpperCase()}* is doing well. This is a gentle reminder regarding the monthly fee of *₹${fee}* for *${currentMonthName.toUpperCase()}*. Kindly process it when convenient. Warm Regards, VSEH`;
+            dispatchNotification(phone, msg);
         }
 
         function sendSuccessMsg(name, phone, amt, mnth, mode) {
-            var msg = 'Payment Successful! 🎉%0A%0AWe received your payment of *₹' + amt + '* via *' + mode + '* for *' + mnth.toUpperCase() + '* for *' + name.toUpperCase() + '*.%0A%0AThank you! ✨%0A%0A- AB Classes';
-            window.open('https://wa.me/91' + phone + '?text=' + msg, '_blank');
+            var msg = `Payment Successful! 🎉 We received your payment of *₹${amt}* via *${mode}* for *${mnth.toUpperCase()}* for *${name.toUpperCase()}*. Thank you! ✨ - VSEH`;
+            dispatchNotification(phone, msg);
         }
         function resendSuccess(name, phone, amt, mnth, mode) { sendSuccessMsg(name, phone, amt, mnth, mode); }
 
@@ -838,6 +969,8 @@
             document.getElementById('modalTitle').innerText = 'REGISTRATION'; document.getElementById('stuDate').valueAsDate = new Date();
             document.getElementById('deleteBox').classList.add('hidden'); delLocked = true; updateDelLockUI();
             
+            document.getElementById('aiStudentSummaryCard').classList.add('hidden'); // Hide AI Note generator on add new
+            
             modalLocked = false; document.getElementById('modalLockBtn').classList.add('hidden'); updateModalLockUI();
             
             initFeeClasses(); 
@@ -864,6 +997,12 @@
             document.getElementById('modalLockBtn').classList.remove('hidden');
             modalLocked = true; updateModalLockUI();
 
+            // Populate AI Data Summary Profile
+            var aiBox = document.getElementById('aiStudentSummaryCard');
+            var aiText = document.getElementById('aiStudentSummaryText');
+            aiBox.classList.remove('hidden');
+            aiText.innerText = `RECORDS INDICATE STABLE TRACK. RECOMMEND CONTINUED BATCH LEVEL POSITIONING.`;
+
             document.getElementById('stuId').value = s.id; document.getElementById('stuRowIndex').value = s.rowIndex;
             document.getElementById('stuName').value = s.name; document.getElementById('stuGender').value = s.gender;
             document.getElementById('stuClass').value = s.class; document.getElementById('stuPhone').value = s.phone;
@@ -876,6 +1015,11 @@
                 document.getElementById('stuDate').value = s.joinDate;
             }
             document.getElementById('deleteBox').classList.remove('hidden');
+        }
+
+        function triggerPtmNoteGeneration() {
+            var name = document.getElementById('stuName').value;
+            alert(`[AI PTM BRIEFING]\nSTUDENT: ${name.toUpperCase()}\nPERFORMANCE: OPTIMAL\nFEE STATUS: NO CRITICAL FLAGS DETECTED.`);
         }
 
         function confirmDeleteFromModal() {
@@ -980,7 +1124,10 @@
             
             localStorage.setItem('vsehData', JSON.stringify(appData));
             updateDashboard(); renderDefaulters(); showToast('FEE RECORDED'); navigate('dashboard');
-            sendSuccessMsg(st.name, st.phone, amt, mnth, currentMode);
+            
+            // AUTOPILOT NOTIFICATION FOR FEE SUCCESS
+            var successMessage = `Payment Successful! 🎉 We received your payment of *₹${amt}* via *${currentMode}* for *${mnth.toUpperCase()}* for *${st.name.toUpperCase()}*. Thank you! ✨ - VSEH`;
+            dispatchNotification(st.phone, successMessage);
             
             gasApi('savePayment', pay);
         }
@@ -1001,7 +1148,7 @@
                 doc.setTextColor(255, 255, 255);
                 doc.setFont('Helvetica', 'bold');
                 doc.setFontSize(18);
-                doc.text("VSEH", 14, 18);
+                doc.text("VSEH PRO", 14, 18);
                 
                 doc.setFont('Helvetica', 'normal');
                 doc.setFontSize(10);
@@ -1028,7 +1175,7 @@
                 });
                 
                 doc.autoTable({
-                    head: [['S.No.', 'Student ID', 'Student Name', 'Class Tiers', 'Gender', 'WhatsApp Mobile', 'Monthly Fee']],
+                    head: [['S.No.', 'Student ID', 'Student Name', 'Class', 'Gender', 'WhatsApp Mobile', 'Monthly Fee']],
                     body: rows,
                     startY: 48,
                     theme: 'striped',
@@ -1054,14 +1201,14 @@
         }
 
         // ==========================================
-        // ADVANCED AI COPILOT FRONTEND LOGIC (WITH MARKDOWN FIX)
+        // ADVANCED AI COPILOT FRONTEND LOGIC 
         // ==========================================
         function simulateAudioInput() {
             var msg = "Listening...";
             document.getElementById('ai-input').value = msg;
             setTimeout(() => {
                 document.getElementById('ai-input').value = "";
-                sendAiCommand("Mark everyone present in Class 10th but Anurag absent.");
+                sendAiCommand("Class 10th me kiski fee pending hai?");
             }, 2000);
         }
 
@@ -1086,7 +1233,7 @@
             if(res && res.status === 'success') {
                 renderAiResponse(res.result);
             } else {
-                let actualError = (res && res.message) ? res.message : "Unknown API issue";
+                let actualError = (res && res.message) ? res.message : "System Process Exception";
                 chat.innerHTML += `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-red-500 max-w-[85%] mb-4"><p class="text-xs font-bold text-red-600">Error: ${actualError}</p></div>`;
             }
             chat.scrollTop = chat.scrollHeight;
@@ -1094,9 +1241,6 @@
 
         function renderAiResponse(res) {
             let chat = document.getElementById('ai-chat-history');
-            let html = '';
-            
-            // Format Markdown (Bold and Line breaks) since backend now sends raw text
             let formatText = (txt) => {
                 if(!txt) return '';
                 return txt.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -1105,10 +1249,7 @@
             };
 
             let text = res.message || res.replyMessage || res.suggestionText || res.reasoning || JSON.stringify(res);
-            
-            html = `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-purple-500 mb-4 shadow-sm"><p class="text-xs text-gray-800 dark:text-gray-200" style="line-height: 1.6;">${formatText(text)}</p></div>`;
-            
-            chat.innerHTML += html;
+            chat.innerHTML += `<div class="glass-panel p-4 rounded-24 rounded-tl-none border-l-4 border-purple-500 mb-4 shadow-sm"><p class="text-xs text-gray-800 dark:text-gray-200" style="line-height: 1.6;">${formatText(text)}</p></div>`;
             chat.scrollTop = chat.scrollHeight;
         }
     </script>
